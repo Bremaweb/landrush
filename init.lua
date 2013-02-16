@@ -3,7 +3,7 @@
 landrush = {}
 
 -- Change this to true if you want to require people to claim an area before building or digging
-local requireClaim = true
+local requireClaim = false
 local chunkSize = 16
 
 local claims = {}
