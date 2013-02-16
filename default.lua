@@ -44,6 +44,7 @@ if minetest.get_modpath("default") then
 		sounds = default.node_sound_defaults(),
 		on_construct = function(pos)
 		--local n = minetest.env:get_node(pos)
+		
 			local meta = minetest.env:get_meta(pos)
 			meta:set_string("formspec", "hack:sign_text_input")
 			meta:set_string("infotext", "\"\"")

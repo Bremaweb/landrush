@@ -325,7 +325,7 @@ function landrush.regester_claimnode(node, image)
 end
 
 landrush.regester_claimnode("landclaim", "landrush_landclaim.png")
-landrush.regester_claimnode("landclaim_a", "landrush_landclaim_gem.png")
+landrush.regester_claimnode("landclaim_b", "landrush_landclaim.png")
 
 minetest.register_entity("landrush:showarea",{
 	on_activate = function(self, staticdata, dtime_s)
@@ -374,10 +374,12 @@ minetest.register_chatcommand("showarea", {
 })
 
 minetest.after(0,function()
+	
 	local path = minetest.get_modpath("landrush")
 	dofile(path.."/bucket.lua")
 	dofile(path.."/default.lua")
 	dofile(path.."/doors.lua")
 	dofile(path.."/fire.lua")
+	minetest.log('action','Loading Land Rush Land Claim')
 end)
 
