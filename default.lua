@@ -3,9 +3,9 @@ if minetest.get_modpath("default") then
 		minetest.register_craft({
 			output = 'landrush:landclaim_b',
 			recipe = {
-				{'default:cobble','default:mese_crystal','default:cobble'},
-				{'default:cobble','default:desert_stone','default:cobble'},
-				{'default:cobble','default:stone','default:cobble'}
+				{'default:stone','default:steel_ingot','default:stone'},
+				{'default:steel_ingot','default:mese_crystal','default:steel_ingot'},
+				{'default:stone','default:steel_ingot','default:stone'}
 			}
 		})
 		minetest.register_alias("landclaim", "landrush:landclaim_b")
@@ -14,9 +14,9 @@ if minetest.get_modpath("default") then
 		minetest.register_craft({
 			output = 'landrush:landclaim',
 			recipe = {
-				{'default:cobble','default:cobble','default:cobble'},
-				{'default:cobble','default:mese','default:cobble'},
-				{'default:cobble','default:cobble','default:cobble'}
+				{'default:stone','default:steel_ingot','default:stone'},
+				{'default:steel_ingot','default:mese','default:steel_ingot'},
+				{'default:stone','default:steel_ingot','default:stone'}
 			}
 		})
 		minetest.register_alias("landclaim", "landrush:landclaim")
