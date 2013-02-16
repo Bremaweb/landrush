@@ -303,7 +303,7 @@ minetest.register_chatcommand("mayedit", {
 function landrush.regester_claimnode(node, image)
 	local claimnode = minetest.get_current_modname()..":"..node
 	minetest.register_node(claimnode, {
-		description = "Land Claim",
+		description = "Land Rush Land Claim",
 		tiles = {image},
 		groups = {oddly_breakable_by_hand=2,not_in_creative_inventory=1},
 		on_place = function(itemstack, placer, pointed_thing)
