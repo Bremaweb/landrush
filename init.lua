@@ -4,6 +4,7 @@ landrush = {}
 
 -- Change this to true if you want to require people to claim an area before building or digging
 local requireClaim = false
+local onlineProtection = true
 local chunkSize = 16
 
 local claims = {}
@@ -117,7 +118,7 @@ function landrush.can_interact(name, pos)
 			return nil
 		end
 	else
-		if ( claims[chunk].owner ~= name ) then
+		if ( claims[chunk].owner ~= name and onlineProtection == false ) then
 			minetest.chat_send_player( claims[chunk].owner, "You are being griefed by "..name.." at "..minetest.pos_to_string(pos) )
 			
 			-- TODO --
