@@ -10,6 +10,8 @@ local chunkSize = 16
 local claims = {}
 local filename = minetest.get_worldpath().."/landrush-claims"
 
+minetest.register_privilege("landrush", "Allows player to dig and build anywhere")
+
 function landrush.load_claims()
 	local file = io.open(filename, "r")
 	if file then
@@ -94,7 +96,12 @@ function landrush.get_owner(pos)
 	end
 end
 
-function landrush.can_interact(name, pos)	
+function landrush.can_interact(name, pos)
+
+	if ( minetest.check_player_privs(name, {landrush=true}) ) then
+		return true
+	end
+	
 	local chunk = landrush.get_chunk(pos)
 	-- return claims[chunk] == nil or claims[chunk].owner == name or claims[chunk].shared[name]
 	if ( claims[chunk] == nil ) then
@@ -132,7 +139,7 @@ function landrush.can_interact(name, pos)
 			return true
 		end
 	end
-	return claims[chunk].owner == name or claims[chunk].shared[name] -- requires a landrush landclaim to build
+	return claims[chunk].owner == name or claims[chunk].shared[name]
 end
 
 landrush.default_place = minetest.item_place
