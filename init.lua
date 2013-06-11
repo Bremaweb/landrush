@@ -8,6 +8,10 @@ local onlineProtection = true
 local chunkSize = 16
 
 local claims = {}
+
+-- These are items that can be dug in unclaimed areas when requireClaim is true
+local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true}
+
 local filename = minetest.get_worldpath().."/landrush-claims"
 
 minetest.register_privilege("landrush", "Allows player to dig and build anywhere")
@@ -127,10 +131,7 @@ function landrush.can_interact(name, pos)
 	else
 		if ( claims[chunk].owner ~= name and onlineProtection == false ) then
 			minetest.chat_send_player( claims[chunk].owner, "You are being griefed by "..name.." at "..minetest.pos_to_string(pos) )
-			
-			-- TODO --
-			-- send a chat to all shared people too
-			-- TODO --
+						
 			for u,u in pairs(claims[chunk].shared) do
 				minetest.chat_send_player( u, name.." is griefing your shared claim at "..minetest.pos_to_string(pos) )
 			end
@@ -156,9 +157,9 @@ function minetest.node_dig(pos, node, digger)
 		if ( owner ~= nil ) then
 			minetest.chat_send_player(player, "Area owned by "..owner)
 		else
-			-- allow them to dig their ladder			
-			if ( node['name'] ~= "default:ladder" ) then
-				minetest.chat_send_player(player,"Area unclaimed, claim this are to build")
+			-- allow them to dig the global dig list		
+			if ( global_dig[node['name']] ~= true ) then
+				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 			else
 				landrush.default_dig(pos, node, digger)
 			end
@@ -176,7 +177,7 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 			if ( owner ~= nil ) then
 				minetest.chat_send_player(player, "Area owned by "..owner)				
 			else
-				minetest.chat_send_player(player,"Area unclaimed, claim this are to build")
+				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 			end
 		end
 	else
@@ -214,17 +215,17 @@ minetest.register_chatcommand("unclaim", {
 		local pos = player:getpos()
 		local owner = landrush.get_owner(pos)
 		local inv = player:get_inventory()
-		if owner then
-			if owner == name then
+		if owner then						
+			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
 				chunk = landrush.get_chunk(pos)
-				if inv:room_for_item("main", claims[chunk].claimtype) then
-					player:get_inventory():add_item("main", {name=claims[chunk].claimtype})
+				--if inv:room_for_item("main", claims[chunk].claimtype) then
+					-- player:get_inventory():add_item("main", {name=claims[chunk].claimtype}) -- they don't get their claim item back
 					claims[chunk] = nil
 					landrush.save_claims()
 					minetest.chat_send_player(name, "You renounced your claim on this area.")
-				else
-					minetest.chat_send_player(name, "Your inventory is full.")
-				end
+				--else
+--					minetest.chat_send_player(name, "Your inventory is full.")
+	--			end
 			else
 				minetest.chat_send_player(name, "This area is owned by "..owner)
 			end
@@ -243,7 +244,7 @@ minetest.register_chatcommand("sharearea", {
 		local pos = player:getpos()
 		local owner = landrush.get_owner(pos)
 		if owner then
-			if owner == name and name ~= param then
+			if ( owner == name and name ~= param ) or minetest.check_player_privs(name, {landrush=true}) then
 				if minetest.env:get_player_by_name(param) then
 					claims[landrush.get_chunk(pos)].shared[param] = param
 					landrush.save_claims()
@@ -270,7 +271,7 @@ minetest.register_chatcommand("unsharearea", {
 		local pos = player:getpos()
 		local owner = landrush.get_owner(pos)
 		if owner then
-			if owner == name then
+			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
 				if name ~= param then
 					claims[landrush.get_chunk(pos)].shared[param] = nil
 					landrush.save_claims()
