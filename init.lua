@@ -3,7 +3,7 @@
 landrush = {}
 
 -- Change this to true if you want to require people to claim an area before building or digging
-local requireClaim = true
+local requireClaim = false
 local onlineProtection = true
 local chunkSize = 16
 
@@ -14,7 +14,7 @@ local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["defau
 
 local filename = minetest.get_worldpath().."/landrush-claims"
 
-minetest.register_privilege("landrush", "Allows player to dig and build anywhere, and use the sharearea and unclaim commands on any claim.")
+minetest.register_privilege("landrush", "Allows player to dig and build anywhere, and use the landrush chat commands.")
 
 function landrush.load_claims()
 	local file = io.open(filename, "r")
@@ -147,7 +147,6 @@ landrush.default_place = minetest.item_place
 landrush.default_dig = minetest.node_dig
 
 -- Redefined Lua:
-
 function minetest.node_dig(pos, node, digger)
 	local player = digger:get_player_name()
 	if landrush.can_interact(player, pos) then
@@ -168,21 +167,23 @@ function minetest.node_dig(pos, node, digger)
 end
 
 function minetest.item_place(itemstack, placer, pointed_thing)
-	if itemstack:get_definition().type == "node" and itemstack:get_name() ~= "default:ladder" then
+	--if itemstack:get_definition().type == "node" then
 	owner = landrush.get_owner(pointed_thing.above)
 	player = placer:get_player_name()
 		if landrush.can_interact(player, pointed_thing.above) then
 			return landrush.default_place(itemstack, placer, pointed_thing)
 		else
 			if ( owner ~= nil ) then
-				minetest.chat_send_player(player, "Area owned by "..owner)				
+				minetest.chat_send_player(player, "Area owned by "..owner)
+				return itemstack				
 			else
 				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
+				return itemstack
 			end
 		end
-	else
+	--[[else
 		return landrush.default_place(itemstack, placer, pointed_thing)
-	end
+	end]]
 end
 				
 landrush.load_claims()
