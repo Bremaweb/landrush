@@ -3,18 +3,18 @@
 landrush = {}
 
 -- Change this to true if you want to require people to claim an area before building or digging
-local requireClaim = false
+local requireClaim = true
 local onlineProtection = true
 local chunkSize = 16
 
 local claims = {}
 
 -- These are items that can be dug in unclaimed areas when requireClaim is true
-local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true}
+local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true,["default:grass"]=true,["default:grass_1"]=true,["default:grass_2"]=true,["default:grass_3"]=true,["default:grass_4"]=true}
 
 local filename = minetest.get_worldpath().."/landrush-claims"
 
-minetest.register_privilege("landrush", "Allows player to dig and build anywhere")
+minetest.register_privilege("landrush", "Allows player to dig and build anywhere, and use the sharearea and unclaim commands on any claim.")
 
 function landrush.load_claims()
 	local file = io.open(filename, "r")
@@ -158,7 +158,7 @@ function minetest.node_dig(pos, node, digger)
 			minetest.chat_send_player(player, "Area owned by "..owner)
 		else
 			-- allow them to dig the global dig list		
-			if ( global_dig[node['name']] ~= true ) then
+			if ( global_dig_list[node['name']] ~= true ) then
 				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 			else
 				landrush.default_dig(pos, node, digger)
