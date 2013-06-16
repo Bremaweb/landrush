@@ -1,13 +1,20 @@
--- Lua definitions:
-
 landrush = {}
 
--- Change this to true if you want to require people to claim an area before building or digging
-local requireClaim = false
-local onlineProtection = true
+
+local requireClaim = false 		-- Change this to true if you want to require people to claim an area before building or digging
+local onlineProtection = true	-- false turns protection off when the claim owner is online
+
+local autoBan = true		-- users who attempt to dig and build in claimed areas can be auto banned
+local banLevel = 40			-- the offense level they must exceed to get banned, 40 is roughly 5 nodes dug in the same area
+local banWarning = 25		-- the offense level they start getting ban warnings
+local offenseReset = 1440	-- after this number of minutes all offenses will be forgiven
+local adminUser = ''		-- this user will be messaged if chat plus is installed when a player is autobanned
+
 local chunkSize = 16
 
 local claims = {}
+
+local offense = {}
 
 -- These are items that can be dug in unclaimed areas when requireClaim is true
 local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true,["default:grass"]=true,["default:grass_1"]=true,["default:grass_2"]=true,["default:grass_3"]=true,["default:grass_4"]=true}
@@ -155,6 +162,52 @@ function minetest.node_dig(pos, node, digger)
 		local owner = landrush.get_owner(pos)
 		if ( owner ~= nil ) then
 			minetest.chat_send_player(player, "Area owned by "..owner)
+			--[[ **********************************************
+					START THE AUTOBAN SECTION!!					
+				***********************************************]]
+			if ( autoBan == true ) then
+				if ( offense[player] == nil ) then
+					offense[player] = {count=0,lastpos=nil,lasttime=os.time()}
+				end
+				
+				local timediff = (os.time() - offense[player].lasttime)/60
+				local distance = landrush.get_distance(offense[player].lastpos,pos)
+				
+				-- reset offenses after a given time period
+				if timediff > offenseReset then
+					offense[player].count=0
+				end
+				
+				-- offense amount starts at 10 and is decreased based on the length of time between offenses
+				-- and the distance from the last offense. This weighted system tries to make it fair for people who aren't
+				-- intentionally griefing
+				offenseAmount = ( 10 - ( timediff / 10 ) ) - ( ( distance / chunkSize ) * 0.5 )
+							
+				offense[player].count=offense[player].count + offenseAmount
+				minetest.log("action",player.." greifing attempt")
+								
+				if ( offense[player].count > banLevel ) then
+					minetest.chat_send_player(player, "You have been banned!")
+					minetest.log("action",player.." has been banned for griefing attempts")
+					minetest.chat_send_all(player.." has been banned for griefing attempts")
+					if ( chatplus ) then					
+						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for attempted griefing")					
+					end
+					minetest.ban_player(player)
+					return
+				end
+				
+				if ( offense[player].count > banWarning ) then
+					minetest.chat_send_player(player, "Stop trying to dig in claimed areas or you will be banned!")
+					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})
+				end
+				
+				offense[player].lasttime = os.time()
+				
+			end
+			--[[ **********************************************
+					END THE AUTOBAN SECTION!!					
+				***********************************************]]
 		else
 			-- allow them to dig the global dig list		
 			if ( global_dig_list[node['name']] ~= true ) then
@@ -166,8 +219,7 @@ function minetest.node_dig(pos, node, digger)
 	end
 end
 
-function minetest.item_place(itemstack, placer, pointed_thing)
-	--if itemstack:get_definition().type == "node" then
+function minetest.item_place(itemstack, placer, pointed_thing)	
 	owner = landrush.get_owner(pointed_thing.above)
 	player = placer:get_player_name()
 		if landrush.can_interact(player, pointed_thing.above) then
@@ -180,10 +232,7 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 				return itemstack
 			end
-		end
-	--[[else
-		return landrush.default_place(itemstack, placer, pointed_thing)
-	end]]
+		end	
 end
 				
 landrush.load_claims()
@@ -382,6 +431,16 @@ minetest.register_chatcommand("showarea", {
 -- (Removed at Rarkenin's request)
 	end,
 })
+
+function landrush.get_distance(pos1,pos2)
+
+if ( pos1 ~= nil and pos2 ~= nil ) then
+	return math.abs(math.floor(math.sqrt( (pos1.x - pos2.x)^2 + (pos1.y - pos2.y)^2 + (pos1.z - pos2.z)^2 )))
+else
+	return 0
+end
+
+end
 
 minetest.after(0,function()
 	
