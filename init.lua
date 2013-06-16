@@ -161,7 +161,7 @@ function minetest.node_dig(pos, node, digger)
 	else
 		local owner = landrush.get_owner(pos)
 		if ( owner ~= nil ) then
-			minetest.chat_send_player(player, "Area owned by "..owner)
+			minetest.chat_send_player(player, "Area owned by "..owner.." stop trying to dig here!")
 			--[[ **********************************************
 					START THE AUTOBAN SECTION!!					
 				***********************************************]]
@@ -199,6 +199,7 @@ function minetest.node_dig(pos, node, digger)
 				
 				if ( offense[player].count > banWarning ) then
 					minetest.chat_send_player(player, "Stop trying to dig in claimed areas or you will be banned!")
+					minetest.chat_send_player(player, "Use /showarea and /landowner to see the protected area and who owns it.")
 					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})
 				end
 				
