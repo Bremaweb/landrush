@@ -4,7 +4,7 @@ landrush = {}
 local requireClaim = false 		-- Change this to true if you want to require people to claim an area before building or digging
 local onlineProtection = true	-- false turns protection off when the claim owner is online
 
-local autoBan = true		-- users who attempt to dig and build in claimed areas can be auto banned
+local autoBan = false		-- users who attempt to dig and build in claimed areas can be auto banned
 local banLevel = 40			-- the offense level they must exceed to get banned, 40 is roughly 5 nodes dug in the same area
 local banWarning = 25		-- the offense level they start getting ban warnings
 local offenseReset = 1440	-- after this number of minutes all offenses will be forgiven
