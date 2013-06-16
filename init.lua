@@ -8,7 +8,7 @@ local autoBan = false		-- users who attempt to dig and build in claimed areas ca
 local banLevel = 40			-- the offense level they must exceed to get banned, 40 is roughly 5 nodes dug in the same area
 local banWarning = 25		-- the offense level they start getting ban warnings
 local offenseReset = 1440	-- after this number of minutes all offenses will be forgiven
-local adminUser = ''		-- this user will be messaged if chat plus is installed when a player is autobanned
+local adminUser = nil		-- this user will be messaged if chat plus is installed when a player is autobanned
 
 local chunkSize = 16
 
@@ -190,7 +190,7 @@ function minetest.node_dig(pos, node, digger)
 					minetest.chat_send_player(player, "You have been banned!")
 					minetest.log("action",player.." has been banned for griefing attempts")
 					minetest.chat_send_all(player.." has been banned for griefing attempts")
-					if ( chatplus ) then					
+					if ( chatplus and adminUser ~= nil) then					
 						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for attempted griefing")					
 					end
 					minetest.ban_player(player)
