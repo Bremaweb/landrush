@@ -1,8 +1,11 @@
-landrush = {}
+minetest.log('action','Loading Land Rush Land Claim')
 
+landrush = {}
 
 local requireClaim = false 		-- Change this to true if you want to require people to claim an area before building or digging
 local onlineProtection = true	-- false turns protection off when the claim owner is online
+
+local offenseDamage = 4			-- how much damage is dealt to the player when they dig in protected areas
 
 local autoBan = false		-- users who attempt to dig and build in claimed areas can be auto banned
 local banLevel = 40			-- the offense level they must exceed to get banned, 40 is roughly 5 nodes dug in the same area
@@ -10,11 +13,12 @@ local banWarning = 25		-- the offense level they start getting ban warnings
 local offenseReset = 1440	-- after this number of minutes all offenses will be forgiven
 local adminUser = nil		-- this user will be messaged if chat plus is installed when a player is autobanned
 
-local chunkSize = 16
-
+local chunkSize = 16		-- don't change this value after you start using landrush
 local claims = {}
-
 local offense = {}
+
+gstepCount = 0
+playerHudItems = {}
 
 -- These are items that can be dug in unclaimed areas when requireClaim is true
 local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true,["default:grass"]=true,["default:grass_1"]=true,["default:grass_2"]=true,["default:grass_3"]=true,["default:grass_4"]=true}
@@ -162,12 +166,13 @@ function minetest.node_dig(pos, node, digger)
 		local owner = landrush.get_owner(pos)
 		if ( owner ~= nil ) then
 			minetest.chat_send_player(player, "Area owned by "..owner.." stop trying to dig here!")
+			digger:set_hp( digger:get_hp() - offenseDamage )
 			--[[ **********************************************
 					START THE AUTOBAN SECTION!!					
 				***********************************************]]
 			if ( autoBan == true ) then
 				if ( offense[player] == nil ) then
-					offense[player] = {count=0,lastpos=nil,lasttime=os.time()}
+					offense[player] = {count=0,lastpos=nil,lasttime=os.time(),bancount=0}
 				end
 				
 				local timediff = (os.time() - offense[player].lasttime)/60
@@ -187,23 +192,42 @@ function minetest.node_dig(pos, node, digger)
 				minetest.log("action",player.." greifing attempt")
 								
 				if ( offense[player].count > banLevel ) then
-					minetest.chat_send_player(player, "You have been banned!")
+					offense[player].bancount = offense[player].bancount + 1
+					
+					local banlength = offense[player].bancount * 10
+					
+					if ( offense[player].bancount < 4 ) then
+						minetest.chat_send_player(player, "You have been banned for "..tostring(banlength).." minutes!")
+					else
+						minetest.chat_send_player(player, "You have been banned!")
+					end
+					
 					minetest.log("action",player.." has been banned for griefing attempts")
 					minetest.chat_send_all(player.." has been banned for griefing attempts")
+					
 					if ( chatplus and adminUser ~= nil) then					
-						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for attempted griefing")					
+						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for "..tostring(banlength).." minutes for attempted griefing")					
 					end
 					minetest.ban_player(player)
+					
+					offense[player].count = 0
+					offense[player].lastpos = nil
+					
+					if ( offense[player].bancount < 4 ) then
+						minetest.after( (banlength * 60), minetest.unban_player_or_ip,player )
+					end
+					
 					return
 				end
 				
 				if ( offense[player].count > banWarning ) then
 					minetest.chat_send_player(player, "Stop trying to dig in claimed areas or you will be banned!")
 					minetest.chat_send_player(player, "Use /showarea and /landowner to see the protected area and who owns it.")
-					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})
+					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})					
 				end
 				
 				offense[player].lasttime = os.time()
+				offense[player].lastpos = pos
 				
 			end
 			--[[ **********************************************
@@ -240,132 +264,12 @@ landrush.load_claims()
 -- Load now
 
 -- In-game additions:
-
-minetest.register_chatcommand("landowner", {
-	params = "",
-	description = "tells the owner of the current map chunk",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		local owner = landrush.get_owner(pos)
-		if owner then
-			minetest.chat_send_player(name, "This area is owned by "..owner)
-		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end
-	end,
-})
-
-minetest.register_chatcommand("unclaim", {
-	params = "",
-	description = "unclaims the current map chunk",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		local owner = landrush.get_owner(pos)
-		local inv = player:get_inventory()
-		if owner then						
-			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
-				chunk = landrush.get_chunk(pos)
-				--if inv:room_for_item("main", claims[chunk].claimtype) then
-					-- player:get_inventory():add_item("main", {name=claims[chunk].claimtype}) -- they don't get their claim item back
-					claims[chunk] = nil
-					landrush.save_claims()
-					minetest.chat_send_player(name, "You renounced your claim on this area.")
-				--else
---					minetest.chat_send_player(name, "Your inventory is full.")
-	--			end
-			else
-				minetest.chat_send_player(name, "This area is owned by "..owner)
-			end
-		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end
-	end,
-})
-
-minetest.register_chatcommand("sharearea", {
-	params = "<name>",
-	description = "shares the current map chunk with <name>",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		local owner = landrush.get_owner(pos)
-		if owner then
-			if ( owner == name and name ~= param ) or minetest.check_player_privs(name, {landrush=true}) then
-				if minetest.env:get_player_by_name(param) then
-					claims[landrush.get_chunk(pos)].shared[param] = param
-					landrush.save_claims()
-					minetest.chat_send_player(name, param.." may now edit this area.")
-					minetest.chat_send_player(param, name.." has just shared an area with you.")
-				else
-					minetest.chat_send_player(name, param.." is not a valid player.")
-				end
-			else
-				minetest.chat_send_player(name, "This area is owned by "..owner)
-			end
-		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end
-	end,
-})
-
-minetest.register_chatcommand("unsharearea", {
-	params = "<name>",
-	description = "unshares the current map chunk with <name>",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		local owner = landrush.get_owner(pos)
-		if owner then
-			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
-				if name ~= param then
-					claims[landrush.get_chunk(pos)].shared[param] = nil
-					landrush.save_claims()
-					minetest.chat_send_player(name, param.." may no longer edit this area.")
-					minetest.chat_send_player(param, name.." has just revoked your editing privileges in an area.")
-				else
-					minetest.chat_send_player(name, 'Use "/unclaim" to unclaim the aria.')
-				end
-			else
-				minetest.chat_send_player(name, "This area is owned by "..owner)
-			end
-		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end
-	end,
-})
-
-minetest.register_chatcommand("mayedit", {
-	params = "",
-	description = "lists the people who may edit the current map chunk",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		local mayedit = landrush.get_owner(pos)
-		if mayedit then
-			local chunk = landrush.get_chunk(pos)
-			for user, user in pairs(claims[chunk].shared) do
-				mayedit = mayedit..", "..user
-			end
-			minetest.chat_send_player(name, mayedit)
-		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end
-	end,
-})
-
-function landrush.regester_claimnode(node, image)
+function landrush.register_claimnode(node, image)
 	local claimnode = minetest.get_current_modname()..":"..node
 	minetest.register_node(claimnode, {
 		description = "Land Rush Land Claim",
 		tiles = {image},
-		groups = {oddly_breakable_by_hand=2,not_in_creative_inventory=1},
+		groups = {oddly_breakable_by_hand=2},
 		on_place = function(itemstack, placer, pointed_thing)
 			owner = landrush.get_owner(pointed_thing.above)
 			player = placer:get_player_name()
@@ -384,8 +288,8 @@ function landrush.regester_claimnode(node, image)
 	})
 end
 
-landrush.regester_claimnode("landclaim", "landrush_landclaim.png")
-landrush.regester_claimnode("landclaim_b", "landrush_landclaim.png")
+landrush.register_claimnode("landclaim", "landrush_landclaim.png")
+landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
 
 minetest.register_entity("landrush:showarea",{
 	on_activate = function(self, staticdata, dtime_s)
@@ -399,7 +303,7 @@ minetest.register_entity("landrush:showarea",{
 		weight = 0,
 		collisionbox = {-8,-8,-8,8,8,8},
 		visual = "mesh",
-		visual_size = {x=16.1, y=120.1},
+		visual_size = {x=16.1, y=16.1},
 		mesh = "landrush_showarea.x",
 		textures = {"landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png"}, -- number of required textures depends on visual
 		colors = {}, -- number of required colors depends on visual
@@ -411,27 +315,31 @@ minetest.register_entity("landrush:showarea",{
 	}
 })
 
-minetest.register_chatcommand("showarea", {
-	params = "",
-	description = "highlights the boundaries of the current protected area",
-	privs = {interact=true},
-	func = function(name, param)
-		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		--local owner = landrush.get_owner(pos)
---		if owner then
-			--if landrush.can_interact(name, pos) then
-				local entpos = landrush.get_chunk_center(pos)
-				minetest.env:add_entity(entpos, "landrush:showarea")
-			--else
-			--	minetest.chat_send_player(name, "This area is owned by "..owner)
-			--end
---[[		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end]]
--- (Removed at Rarkenin's request)
-	end,
-})
+minetest.register_globalstep(function(dtime)
+	gstepCount = gstepCount + dtime
+	if ( gstepCount > 1 ) then
+		for _,player in pairs(minetest.get_connected_players()) do
+			local name = player:get_player_name()
+			if ( playerHudItems[name] ) then
+				player:hud_remove(playerHudItems[name])
+			end
+			
+			owner = landrush.get_owner(player:getpos())
+			if ( owner ~= nil ) then
+				playerHudItems[name] = player:hud_add({
+						hud_elem_type = "text",
+						name = "LandOwner",
+						number = 0xFFFFFF,
+						position = {x=.2, y=.98},
+						text="Land Owner: "..owner,
+						scale = {x=200,y=25},
+						alignment = {x=0, y=0},
+				})
+			end			
+		end
+		gstepCount = 0
+	end
+end)
 
 function landrush.get_distance(pos1,pos2)
 
@@ -443,13 +351,12 @@ end
 
 end
 
-minetest.after(0,function()
-	
-	local path = minetest.get_modpath("landrush")
-	dofile(path.."/bucket.lua")
-	dofile(path.."/default.lua")
-	dofile(path.."/doors.lua")
-	dofile(path.."/fire.lua")
-	minetest.log('action','Loading Land Rush Land Claim')
-end)
+minetest.after( 10, function ()
+local path = minetest.get_modpath("landrush")
 
+dofile(path.."/bucket.lua")
+dofile(path.."/default.lua")
+dofile(path.."/doors.lua")
+dofile(path.."/fire.lua")
+dofile(path.."/chatcommands.lua")
+end )
