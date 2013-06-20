@@ -318,10 +318,10 @@ minetest.register_entity("landrush:showarea",{
 minetest.register_globalstep(function(dtime)
 	gstepCount = gstepCount + dtime
 	if ( gstepCount > 2 ) then
-	local sameowner = false
+	
 		for _,player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
-			
+			local sameowner = false	
 			owner = landrush.get_owner(player:getpos())
 			
 			if ( playerHudItems[name] ~= nil ) then
