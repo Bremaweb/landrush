@@ -319,7 +319,7 @@ minetest.register_globalstep(function(dtime)
 	gstepCount = gstepCount + dtime
 	if ( gstepCount > 2 ) then
 	
-		for _,player in pairs(minetest.get_connected_players()) do
+		for _,player in ipairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
 			local sameowner = false	
 			owner = landrush.get_owner(player:getpos())
@@ -337,7 +337,7 @@ minetest.register_globalstep(function(dtime)
 			end
 			
 			if ( owner ~= nil and sameowner == false ) then
-				minetest.log('action','Redraw hud for'..name)			
+				minetest.log('action','Redraw hud for '..name)			
 				playerHudItems[name] = {hud = player:hud_add({
 						hud_elem_type = "text",
 						name = "LandOwner",
