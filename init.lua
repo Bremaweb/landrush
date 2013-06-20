@@ -13,8 +13,8 @@ local banWarning = 25		-- the offense level they start getting ban warnings
 local offenseReset = 1440	-- after this number of minutes all offenses will be forgiven
 local adminUser = nil		-- this user will be messaged if chat plus is installed when a player is autobanned
 
-local chunkSize = 16		-- don't change this value after you start using landrush
-local claims = {}
+chunkSize = 16		-- don't change this value after you start using landrush
+claims = {}
 local offense = {}
 
 gstepCount = 0
