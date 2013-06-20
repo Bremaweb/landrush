@@ -317,16 +317,28 @@ minetest.register_entity("landrush:showarea",{
 
 minetest.register_globalstep(function(dtime)
 	gstepCount = gstepCount + dtime
-	if ( gstepCount > 1 ) then
+	if ( gstepCount > 2 ) then
+	local sameowner = false
 		for _,player in pairs(minetest.get_connected_players()) do
 			local name = player:get_player_name()
-			if ( playerHudItems[name] ) then
-				player:hud_remove(playerHudItems[name])
-			end
 			
 			owner = landrush.get_owner(player:getpos())
-			if ( owner ~= nil ) then
-				playerHudItems[name] = player:hud_add({
+			
+			if ( playerHudItems[name] ~= nil ) then
+				if ( playerHudItems[name].lastowner == owner ) then
+					-- same owner as last time don't update the hud
+					sameowner = true				
+				end
+			end
+			
+			if ( playerHudItems[name] ~= nil and sameowner == false ) then
+					player:hud_remove(playerHudItems[name].hud)
+					playerHudItems[name] = nil
+			end
+			
+			if ( owner ~= nil and sameowner == false ) then
+				minetest.log('action','Redraw hud for'..name)			
+				playerHudItems[name] = {hud = player:hud_add({
 						hud_elem_type = "text",
 						name = "LandOwner",
 						number = 0xFFFFFF,
@@ -334,7 +346,7 @@ minetest.register_globalstep(function(dtime)
 						text="Land Owner: "..owner,
 						scale = {x=200,y=25},
 						alignment = {x=0, y=0},
-				})
+				}), lastowner=owner}			
 			end			
 		end
 		gstepCount = 0
