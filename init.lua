@@ -365,10 +365,11 @@ function landrush.get_distance(pos1,pos2)
 
 end
 
-
 if ( minetest.get_modpath("money2") ) then
+	minetest.log('action','Loading Landrush Land Sale')
 	dofile(path.."/landsale.lua")
 end
+
 
 minetest.after(0, function ()
 
