@@ -24,9 +24,15 @@ minetest.register_node("landrush:sale_block",{
 		-- do the sale -- maybe a are you sure formspec?
 		local name = puncher:get_player_name()
 		local owner = landrush.get_owner(pos)
-		if ( name ~= owner and owner ~= nil ) then
+		if ( name ~= owner and owner ~= nil ) then			
 			local meta = minetest.get_meta(pos)
 			local price = meta:get_int("price")
+			
+			if ( price == 0 ) then
+				minetest.chat_send_player(name,'Land Sale setup not complete')
+				return
+			end
+			
 			if ( money.get(name) >= price ) then
 				local transfer = money.transfer(name,owner,price)
 				if ( transfer == nil ) then
