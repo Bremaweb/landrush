@@ -4,7 +4,7 @@ minetest.register_node("landrush:sale_block",{
 	tiles={"landrush_sale_block.png"},
 	groups = {crumbly=2,snappy=2,oddly_breakable_by_hand=2},
 	drop = "landrush:sale_block",
-	
+			
 	after_place_node = function (pos, placer)
 		local name = placer:get_player_name()
 		local owner = landrush.get_owner(pos)
@@ -24,7 +24,7 @@ minetest.register_node("landrush:sale_block",{
 		-- do the sale -- maybe a are you sure formspec?
 		local name = puncher:get_player_name()
 		local owner = landrush.get_owner(pos)
-		if ( name ~= owner ) then
+		if ( name ~= owner and owner ~= nil ) then
 			local meta = minetest.get_meta(pos)
 			local price = meta:get_int("price")
 			if ( money.get(name) >= price ) then
