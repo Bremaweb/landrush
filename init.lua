@@ -20,6 +20,8 @@ local offense = {}
 gstepCount = 0
 playerHudItems = {}
 
+local path = minetest.get_modpath("landrush")
+
 -- These are items that can be dug in unclaimed areas when requireClaim is true
 local global_dig_list = {["default:ladder"]=true,["default:leaves"]=true,["default:tree"]=true,["default:grass"]=true,["default:grass_1"]=true,["default:grass_2"]=true,["default:grass_3"]=true,["default:grass_4"]=true}
 
@@ -303,7 +305,7 @@ minetest.register_entity("landrush:showarea",{
 		weight = 0,
 		collisionbox = {-8,-8,-8,8,8,8},
 		visual = "mesh",
-		visual_size = {x=16.1, y=16.1},
+		visual_size = {x=16.1, y=120.1},
 		mesh = "landrush_showarea.x",
 		textures = {"landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png"}, -- number of required textures depends on visual
 		colors = {}, -- number of required colors depends on visual
@@ -318,8 +320,9 @@ minetest.register_entity("landrush:showarea",{
 minetest.register_globalstep(function(dtime)
 	gstepCount = gstepCount + dtime
 	if ( gstepCount > 2 ) then
-	
-		for _,player in ipairs(minetest.get_connected_players()) do
+		gstepCount=0
+		local oplayers = minetest.get_connected_players()
+		for _,player in ipairs(oplayers) do
 			local name = player:get_player_name()
 			local sameowner = false	
 			owner = landrush.get_owner(player:getpos())
@@ -337,7 +340,7 @@ minetest.register_globalstep(function(dtime)
 			end
 			
 			if ( owner ~= nil and sameowner == false ) then
-				minetest.log('action','Redraw hud for '..name)			
+				--minetest.log('action','Redraw hud for '..name)			
 				playerHudItems[name] = {hud = player:hud_add({
 						hud_elem_type = "text",
 						name = "LandOwner",
@@ -348,27 +351,31 @@ minetest.register_globalstep(function(dtime)
 						alignment = {x=0, y=0},
 				}), lastowner=owner}			
 			end			
-		end
-		gstepCount = 0
+		end		
 	end
 end)
 
 function landrush.get_distance(pos1,pos2)
 
-if ( pos1 ~= nil and pos2 ~= nil ) then
-	return math.abs(math.floor(math.sqrt( (pos1.x - pos2.x)^2 + (pos1.y - pos2.y)^2 + (pos1.z - pos2.z)^2 )))
-else
-	return 0
-end
+	if ( pos1 ~= nil and pos2 ~= nil ) then
+		return math.abs(math.floor(math.sqrt( (pos1.x - pos2.x)^2 + (pos1.y - pos2.y)^2 + (pos1.z - pos2.z)^2 )))
+	else
+		return 0
+	end
 
 end
 
-minetest.after( 10, function ()
-local path = minetest.get_modpath("landrush")
+
+if ( minetest.get_modpath("money2") ) then
+	dofile(path.."/landsale.lua")
+end
+
+minetest.after(0, function ()
 
 dofile(path.."/bucket.lua")
 dofile(path.."/default.lua")
 dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
+
 end )
