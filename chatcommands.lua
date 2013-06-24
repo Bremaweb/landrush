@@ -129,6 +129,7 @@ minetest.register_chatcommand("showarea", {
 --		if owner then
 			--if landrush.can_interact(name, pos) then
 				local entpos = landrush.get_chunk_center(pos)
+				entpos.y = (pos.y-1)
 				minetest.env:add_entity(entpos, "landrush:showarea")
 			--else
 			--	minetest.chat_send_player(name, "This area is owned by "..owner)

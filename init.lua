@@ -305,9 +305,9 @@ minetest.register_entity("landrush:showarea",{
 		weight = 0,
 		collisionbox = {-8,-8,-8,8,8,8},
 		visual = "mesh",
-		visual_size = {x=16.1, y=120.1},
+		visual_size = {x=16.1, y=16.1},
 		mesh = "landrush_showarea.x",
-		textures = {"landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png"}, -- number of required textures depends on visual
+		textures = {nil, nil, "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png"}, -- number of required textures depends on visual
 		colors = {}, -- number of required colors depends on visual
 		spritediv = {x=1, y=1},
 		initial_sprite_basepos = {x=0, y=0},
