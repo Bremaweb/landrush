@@ -1,28 +1,4 @@
-if minetest.get_modpath("default") then
-	if minetest.registered_items["default:mese_crystal"] then
-		minetest.register_craft({
-			output = 'landrush:landclaim_b',
-			recipe = {
-				{'default:stone','default:steel_ingot','default:stone'},
-				{'default:steel_ingot','default:mese_crystal','default:steel_ingot'},
-				{'default:stone','default:steel_ingot','default:stone'}
-			}
-		})
-		minetest.register_alias("landclaim", "landrush:landclaim_b")
-		--minetest.registered_items["landrush:landclaim_b"].groups.not_in_creative_inventory = nil
-	else
-		minetest.register_craft({
-			output = 'landrush:landclaim',
-			recipe = {
-				{'default:stone','default:steel_ingot','default:stone'},
-				{'default:steel_ingot','default:mese','default:steel_ingot'},
-				{'default:stone','default:steel_ingot','default:stone'}
-			}
-		})
-		minetest.register_alias("landclaim", "landrush:landclaim")
-		minetest.registered_items["landrush:landclaim"].groups.not_in_creative_inventory = nil
-	end
-
+if minetest.get_modpath("default") then	
 	minetest.register_node(":default:sign_wall", {
 		description = "Sign",
 		drawtype = "signlike",

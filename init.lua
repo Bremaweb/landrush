@@ -265,12 +265,9 @@ end
 landrush.load_claims()
 -- Load now
 
--- In-game additions:
-function landrush.register_claimnode(node, image)
-	local claimnode = minetest.get_current_modname()..":"..node
-	minetest.register_node(claimnode, {
+	minetest.register_node("landrush:landclaim", {
 		description = "Land Rush Land Claim",
-		tiles = {image},
+		tiles = {"landrush_landclaim.png"},
 		groups = {oddly_breakable_by_hand=2},
 		on_place = function(itemstack, placer, pointed_thing)
 			owner = landrush.get_owner(pointed_thing.above)
@@ -288,10 +285,21 @@ function landrush.register_claimnode(node, image)
 			end
 		end,
 	})
-end
 
-landrush.register_claimnode("landclaim", "landrush_landclaim.png")
-landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
+minetest.register_craft({
+			output = 'landrush:landclaim',
+			recipe = {
+				{'default:stone','default:steel_ingot','default:stone'},
+				{'default:steel_ingot','default:mese_crystal','default:steel_ingot'},
+				{'default:stone','default:steel_ingot','default:stone'}
+			}
+		})
+minetest.register_alias("landclaim", "landrush:landclaim")
+minetest.register_alias("landrush:landclaim_b","landrush:landclaim")
+minetest.registered_items["landrush:landclaim"].groups.not_in_creative_inventory = nil
+
+--landrush.register_claimnode("landclaim", "landrush_landclaim.png")
+--landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
 
 minetest.register_entity("landrush:showarea",{
 	on_activate = function(self, staticdata, dtime_s)
@@ -370,11 +378,10 @@ if ( minetest.get_modpath("money2") ) then
 	dofile(path.."/landsale.lua")
 end
 
-
 minetest.after(0, function ()
 
-dofile(path.."/bucket.lua")
 dofile(path.."/default.lua")
+dofile(path.."/bucket.lua")
 dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
