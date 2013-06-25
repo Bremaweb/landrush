@@ -277,7 +277,7 @@ landrush.load_claims()
 			else
 				minetest.env:remove_node(pointed_thing.above)
 				chunk = landrush.get_chunk(pointed_thing.above)
-				claims[chunk] = {owner=placer:get_player_name(),shared={},claimtype=claimnode}
+				claims[chunk] = {owner=placer:get_player_name(),shared={},claimtype="landclaim"}
 				landrush.save_claims()
 				minetest.chat_send_player(claims[chunk].owner, "You now own this area.")
 				itemstack:take_item()
