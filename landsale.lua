@@ -78,9 +78,9 @@ minetest.register_node("landrush:sale_block",{
 minetest.register_craft({
 	output = "landrush:sale_block",
 	recipe = {
-		{"default:wood","default:wood","default:wood"},
-		{"default:wood","default:wood","default:wood"},
-		{"","default:wood",""}
+		{"","default:wood","default:wood"},
+		{"","default:wood",""},
+		{"default:wood","default:wood",""}
 	}
 })
 
@@ -97,13 +97,3 @@ function landrush.sell_formspec(pos,player)
 	
 	return formspec
 end
-
-function landrush.process_formspec(player, formname, fields)	
-	if ( formname == "landrush_buy" ) then
-	
-	end
-end
-
-
-
-minetest.register_on_player_receive_fields( landrush.process_formspec )

@@ -296,7 +296,6 @@ minetest.register_craft({
 		})
 minetest.register_alias("landclaim", "landrush:landclaim")
 minetest.register_alias("landrush:landclaim_b","landrush:landclaim")
-minetest.registered_items["landrush:landclaim"].groups.not_in_creative_inventory = nil
 
 --landrush.register_claimnode("landclaim", "landrush_landclaim.png")
 --landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
