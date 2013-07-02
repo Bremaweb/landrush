@@ -162,7 +162,7 @@ landrush.default_dig = minetest.node_dig
 -- Redefined Lua:
 function minetest.node_dig(pos, node, digger)
 	local player = digger:get_player_name()
-	if landrush.can_interact(player, pos) then
+	if landrush.can_interact(player, pos) or player == "" then
 		landrush.default_dig(pos, node, digger)
 	else
 		local owner = landrush.get_owner(pos)
