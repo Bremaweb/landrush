@@ -45,7 +45,7 @@ minetest.register_chatcommand("unclaim", {
 })
 
 minetest.register_chatcommand("sharearea", {
-	params = "<name>",
+	params = "<name> or *all to retain ownership but allow anyone to build",
 	description = "shares the current map chunk with <name>",
 	privs = {interact=true},
 	func = function(name, param)
@@ -54,7 +54,7 @@ minetest.register_chatcommand("sharearea", {
 		local owner = landrush.get_owner(pos)
 		if owner then
 			if ( owner == name and name ~= param ) or minetest.check_player_privs(name, {landrush=true}) then
-				if minetest.env:get_player_by_name(param) then
+				if minetest.env:get_player_by_name(param) or param=="*all" then
 					claims[landrush.get_chunk(pos)].shared[param] = param
 					landrush.save_claims()
 					minetest.chat_send_player(name, param.." may now edit this area.")

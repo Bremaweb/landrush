@@ -41,6 +41,11 @@ minetest.register_node("landrush:sale_block",{
 					landrush.save_claims()
 					minetest.chat_send_player(claims[chunk].owner, "You now own this claim.")
 					minetest.remove_node(pos)
+					
+					if ( chatplus ) then					
+						table.insert(chatplus.players[owner].messages,"mail from <LandRush>: "..name.." has bought your claim at "..minetest.pos_to_string(pos).." for "..tostring(price))					
+					end
+					
 				else
 					minetest.chat_send_player(name,"Money transfer failed: "..transfer)
 				end

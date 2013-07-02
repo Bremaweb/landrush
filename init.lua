@@ -130,7 +130,7 @@ function landrush.can_interact(name, pos)
 	end
 	
 	-- if it's the owner or it's shared
-	if ( claims[chunk].shared[name] or claims[chunk].owner == name ) then
+	if ( claims[chunk].shared[name] or claims[chunk].owner == name or claims[chunk].shared['*all'] ) then
 		return true
 	end
 	
