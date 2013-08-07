@@ -77,7 +77,9 @@ function landrush.get_chunk(pos)
 	-- 3 levels of vertical protection	
 	local y = 0
 	
-	if ( pos.y < -60 ) then
+	if ( pos.y < -200 ) then
+		y = -32000
+	elseif ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 140 ) then
 		y = -30
@@ -381,7 +383,7 @@ minetest.after(0, function ()
 
 dofile(path.."/default.lua")
 dofile(path.."/bucket.lua")
-dofile(path.."/doors.lua")
+--dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
 

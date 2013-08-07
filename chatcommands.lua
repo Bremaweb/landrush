@@ -140,3 +140,63 @@ minetest.register_chatcommand("showarea", {
 -- (Removed at Rarkenin's request)
 	end,
 })
+
+minetest.register_chatcommand("shareall", {
+    params = "<name>",
+    description = "shares all your landclaims with <name>",
+    privs = {interact=true},
+    func = function(name, param)
+        
+        if minetest.env:get_player_by_name(param) then
+            local qdone = 0
+            for k,v in pairs(claims) do
+                if claims[k].owner == name then
+                    claims[k].shared[param] = param
+                    qdone = qdone + 1
+                end
+            end
+        
+            landrush.save_claims()
+            
+            if qdone > 0 then
+                minetest.chat_send_player(name, param.." may now edit all of your areas.")
+                minetest.chat_send_player(name, qdone.." total areas were shared.")
+                minetest.chat_send_player(param, name.." has just shared all of their areas with you.")
+            else
+                minetest.chat_send_player(name, param.." was not given any permissions. You may not own any land.")
+            end
+        else
+                minetest.chat_send_player(name, param.." is not a valid player. Player must be online to share.")
+        end
+    end,
+})
+
+minetest.register_chatcommand("unshareall", {
+    params = "<name>",
+    description = "unshares all your landclaims with <name>",
+    privs = {interact=true},
+    func = function(name, param)
+        
+        if minetest.env:get_player_by_name(param) then
+            local qdone = 0
+            for k,v in pairs(claims) do
+                if claims[k].owner == name then
+                    claims[k].shared[param] = nil
+                    qdone = qdone + 1
+                end
+            end
+        
+            landrush.save_claims()
+            
+            if qdone > 0 then
+                minetest.chat_send_player(name, param.." no longer may edit all of your areas.")
+                minetest.chat_send_player(name, qdone.." total areas were unshared.")
+                minetest.chat_send_player(param, name.." has just unshared all of their areas with you.")
+            else
+                minetest.chat_send_player(name, param.." had noting changed. You may not own any land.")
+            end
+        else
+                minetest.chat_send_player(name, param.." is not a valid player. Player must be online to unshare.")
+        end
+    end,
+})
