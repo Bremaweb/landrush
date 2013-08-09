@@ -251,7 +251,8 @@ end
 function minetest.item_place(itemstack, placer, pointed_thing)	
 	owner = landrush.get_owner(pointed_thing.above)
 	player = placer:get_player_name()
-		if landrush.can_interact(player, pointed_thing.above) then
+	minetest.log("action",dump(itemstack:get_name()))
+		if landrush.can_interact(player, pointed_thing.above) or itemstack:get_name() == "" then
 			return landrush.default_place(itemstack, placer, pointed_thing)
 		else
 			if ( owner ~= nil ) then
@@ -383,7 +384,7 @@ minetest.after(0, function ()
 
 dofile(path.."/default.lua")
 dofile(path.."/bucket.lua")
---dofile(path.."/doors.lua")
+dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
 
