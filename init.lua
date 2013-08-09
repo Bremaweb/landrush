@@ -250,8 +250,7 @@ end
 
 function minetest.item_place(itemstack, placer, pointed_thing)	
 	owner = landrush.get_owner(pointed_thing.above)
-	player = placer:get_player_name()
-	minetest.log("action",dump(itemstack:get_name()))
+	player = placer:get_player_name()	
 		if landrush.can_interact(player, pointed_thing.above) or itemstack:get_name() == "" then
 			return landrush.default_place(itemstack, placer, pointed_thing)
 		else
