@@ -299,6 +299,46 @@ minetest.register_craft({
 minetest.register_alias("landclaim", "landrush:landclaim")
 minetest.register_alias("landrush:landclaim_b","landrush:landclaim")
 
+doors:register_door("landrush:shared_door", {
+	description = "Shared Door",
+	inventory_image = "shared_door_inv.png",
+	groups = {snappy=1,bendy=2,cracky=1,melty=2,level=2,door=1},
+	tiles_bottom = {"shared_door_b.png", "door_blue.png"},
+	tiles_top = {"shared_door_a.png", "door_blue.png"},	
+})
+
+function landrush.on_rightclick(pos, dir, check_name, replace, replace_dir, params)
+		pos.y = pos.y+dir
+		if not minetest.get_node(pos).name == check_name then
+			return
+		end
+		local p2 = minetest.get_node(pos).param2
+		p2 = params[p2+1]
+		
+		local meta = minetest.get_meta(pos):to_table()
+		minetest.set_node(pos, {name=replace_dir, param2=p2})
+		minetest.get_meta(pos):from_table(meta)
+		
+		pos.y = pos.y-dir
+		meta = minetest.get_meta(pos):to_table()
+		minetest.set_node(pos, {name=replace, param2=p2})
+		minetest.get_meta(pos):from_table(meta)
+	end
+
+minetest.registered_nodes['landrush:shared_door_b_1'].on_rightclick = function(pos, node, clicker)
+if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_1", "landrush:shared_door_b_2", "landrush:shared_door_t_2", {1,2,3,0})
+end
+end
+
+minetest.registered_nodes['landrush:shared_door_t_1'].on_rightclick = function(pos, node, clicker)
+if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_1", "landrush:shared_door_b_2", "landrush:shared_door_t_2", {1,2,3,0})
+end
+end
+
+
+
 --landrush.register_claimnode("landclaim", "landrush_landclaim.png")
 --landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
 
@@ -367,7 +407,7 @@ end)
 function landrush.get_distance(pos1,pos2)
 
 	if ( pos1 ~= nil and pos2 ~= nil ) then
-		return math.abs(math.floor(math.sqrt( (pos1.x - pos2.x)^2 + (pos1.y - pos2.y)^2 + (pos1.z - pos2.z)^2 )))
+		return math.abs(math.floor(math.sqrt( (pos1.x - pos2.x)^2 + (pos1.z - pos2.z)^2 )))
 	else
 		return 0
 	end
