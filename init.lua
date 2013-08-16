@@ -307,6 +307,15 @@ doors:register_door("landrush:shared_door", {
 	tiles_top = {"shared_door_a.png", "door_blue.png"},	
 })
 
+minetest.register_craft({
+	output = 'landrush:shared_door',
+	recipe = {
+		{'default:steel_ingot','default:steel_ingot',''},
+		{'default:steel_ingot','landrush:landclaim',''},
+		{'default:steel_ingot','default:steel_ingot',''}
+	}
+})
+
 function landrush.on_rightclick(pos, dir, check_name, replace, replace_dir, params)
 		pos.y = pos.y+dir
 		if not minetest.get_node(pos).name == check_name then
