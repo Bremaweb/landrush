@@ -74,9 +74,9 @@ end
 
 function landrush.get_chunk(pos)
 	local x = math.floor(pos.x/chunkSize)
-	-- 3 levels of vertical protection	
+	-- 3 levels of vertical protection
 	local y = 0
-	
+
 	if ( pos.y < -200 ) then
 		y = -32000
 	elseif ( pos.y < -60 ) then
@@ -86,8 +86,8 @@ function landrush.get_chunk(pos)
 	else
 		y = 90
 	end
-	
-	
+
+
 	local z = math.floor(pos.z/chunkSize)
 	return x..","..y..","..z
 end
@@ -95,7 +95,7 @@ end
 function landrush.get_chunk_center(pos)
 	local x = math.floor(pos.x/chunkSize)*chunkSize+7.5
 	local y = 0
-	
+
 	if ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 120 ) then
@@ -103,7 +103,7 @@ function landrush.get_chunk_center(pos)
 	else
 		y = 120
 	end
-	
+
 	local z = math.floor(pos.z/chunkSize)*chunkSize+7.5
 	return {x=x,y=y,z=z}
 end
@@ -120,7 +120,7 @@ function landrush.can_interact(name, pos)
 	if ( minetest.check_player_privs(name, {landrush=true}) ) then
 		return true
 	end
-	
+
 	local chunk = landrush.get_chunk(pos)
 	-- return claims[chunk] == nil or claims[chunk].owner == name or claims[chunk].shared[name]
 	if ( claims[chunk] == nil ) then
@@ -128,14 +128,14 @@ function landrush.can_interact(name, pos)
 			return false
 		else
 			return true
-		end		
+		end
 	end
-	
+
 	-- if it's the owner or it's shared
 	if ( claims[chunk].shared[name] or claims[chunk].owner == name or claims[chunk].shared['*all'] ) then
 		return true
 	end
-	
+
 	-- see if the owner is offline, and area is not shared then it's off limits
 	if ( minetest.env:get_player_by_name(claims[chunk].owner) == nil ) then
 		if ( claims[chunk].shared[name] ) then
@@ -146,11 +146,11 @@ function landrush.can_interact(name, pos)
 	else
 		if ( claims[chunk].owner ~= name and onlineProtection == false ) then
 			minetest.chat_send_player( claims[chunk].owner, "You are being griefed by "..name.." at "..minetest.pos_to_string(pos) )
-						
+
 			for u,u in pairs(claims[chunk].shared) do
 				minetest.chat_send_player( u, name.." is griefing your shared claim at "..minetest.pos_to_string(pos) )
 			end
-			
+
 			minetest.chat_send_player( name, "You are griefing "..claims[chunk].owner )
 			return true
 		end
@@ -172,73 +172,73 @@ function minetest.node_dig(pos, node, digger)
 			minetest.chat_send_player(player, "Area owned by "..owner.." stop trying to dig here!")
 			digger:set_hp( digger:get_hp() - offenseDamage )
 			--[[ **********************************************
-					START THE AUTOBAN SECTION!!					
+					START THE AUTOBAN SECTION!!
 				***********************************************]]
 			if ( autoBan == true ) then
 				if ( offense[player] == nil ) then
 					offense[player] = {count=0,lastpos=nil,lasttime=os.time(),bancount=0}
 				end
-				
+
 				local timediff = (os.time() - offense[player].lasttime)/60
 				local distance = landrush.get_distance(offense[player].lastpos,pos)
-				
+
 				-- reset offenses after a given time period
 				if timediff > offenseReset then
 					offense[player].count=0
 				end
-				
+
 				-- offense amount starts at 10 and is decreased based on the length of time between offenses
 				-- and the distance from the last offense. This weighted system tries to make it fair for people who aren't
 				-- intentionally griefing
 				offenseAmount = ( 10 - ( timediff / 10 ) ) - ( ( distance / chunkSize ) * 0.5 )
-							
+
 				offense[player].count=offense[player].count + offenseAmount
 				minetest.log("action",player.." greifing attempt")
-								
+
 				if ( offense[player].count > banLevel ) then
 					offense[player].bancount = offense[player].bancount + 1
-					
+
 					local banlength = offense[player].bancount * 10
-					
+
 					if ( offense[player].bancount < 4 ) then
 						minetest.chat_send_player(player, "You have been banned for "..tostring(banlength).." minutes!")
 					else
 						minetest.chat_send_player(player, "You have been banned!")
 					end
-					
+
 					minetest.log("action",player.." has been banned for griefing attempts")
 					minetest.chat_send_all(player.." has been banned for griefing attempts")
-					
-					if ( chatplus and adminUser ~= nil) then					
-						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for "..tostring(banlength).." minutes for attempted griefing")					
+
+					if ( chatplus and adminUser ~= nil) then
+						table.insert(chatplus.players[adminUser].messages,"mail from <LandRush>: "..player.." banned for "..tostring(banlength).." minutes for attempted griefing")
 					end
 					minetest.ban_player(player)
-					
+
 					offense[player].count = 0
 					offense[player].lastpos = nil
-					
+
 					if ( offense[player].bancount < 4 ) then
 						minetest.after( (banlength * 60), minetest.unban_player_or_ip,player )
 					end
-					
+
 					return
 				end
-				
+
 				if ( offense[player].count > banWarning ) then
 					minetest.chat_send_player(player, "Stop trying to dig in claimed areas or you will be banned!")
 					minetest.chat_send_player(player, "Use /showarea and /landowner to see the protected area and who owns it.")
-					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})					
+					minetest.sound_play("landrush_ban_warning", {to_player=player,gain = 10.0})
 				end
-				
+
 				offense[player].lasttime = os.time()
 				offense[player].lastpos = pos
-				
+
 			end
 			--[[ **********************************************
-					END THE AUTOBAN SECTION!!					
+					END THE AUTOBAN SECTION!!
 				***********************************************]]
 		else
-			-- allow them to dig the global dig list		
+			-- allow them to dig the global dig list
 			if ( global_dig_list[node['name']] ~= true ) then
 				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 			else
@@ -248,22 +248,22 @@ function minetest.node_dig(pos, node, digger)
 	end
 end
 
-function minetest.item_place(itemstack, placer, pointed_thing)	
+function minetest.item_place(itemstack, placer, pointed_thing)
 	owner = landrush.get_owner(pointed_thing.above)
-	player = placer:get_player_name()	
+	player = placer:get_player_name()
 		if landrush.can_interact(player, pointed_thing.above) or itemstack:get_name() == "" then
 			return landrush.default_place(itemstack, placer, pointed_thing)
 		else
 			if ( owner ~= nil ) then
 				minetest.chat_send_player(player, "Area owned by "..owner)
-				return itemstack				
+				return itemstack
 			else
 				minetest.chat_send_player(player,"Area unclaimed, claim this area to build")
 				return itemstack
 			end
-		end	
+		end
 end
-				
+
 landrush.load_claims()
 -- Load now
 
@@ -304,7 +304,7 @@ doors:register_door("landrush:shared_door", {
 	inventory_image = "shared_door_inv.png",
 	groups = {snappy=1,bendy=2,cracky=1,melty=2,level=2,door=1},
 	tiles_bottom = {"shared_door_b.png", "door_blue.png"},
-	tiles_top = {"shared_door_a.png", "door_blue.png"},	
+	tiles_top = {"shared_door_a.png", "door_blue.png"},
 })
 
 minetest.register_craft({
@@ -323,11 +323,11 @@ function landrush.on_rightclick(pos, dir, check_name, replace, replace_dir, para
 		end
 		local p2 = minetest.get_node(pos).param2
 		p2 = params[p2+1]
-		
+
 		local meta = minetest.get_meta(pos):to_table()
 		minetest.set_node(pos, {name=replace_dir, param2=p2})
 		minetest.get_meta(pos):from_table(meta)
-		
+
 		pos.y = pos.y-dir
 		meta = minetest.get_meta(pos):to_table()
 		minetest.set_node(pos, {name=replace, param2=p2})
@@ -342,11 +342,26 @@ end
 
 minetest.registered_nodes['landrush:shared_door_t_1'].on_rightclick = function(pos, node, clicker)
 if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
-	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_1", "landrush:shared_door_b_2", "landrush:shared_door_t_2", {1,2,3,0})
+	landrush.on_rightclick(pos, -1, "landrush:shared_door_b_1", "landrush:shared_door_t_2", "landrush:shared_door_b_2", {1,2,3,0})
 end
 end
 
+-- Fix for duplicating Bug!
+-- Bug was caused, because the reverse order of the on_rightclick was not taken into account
 
+minetest.registered_nodes['landrush:shared_door_b_2'].on_rightclick = function(pos, node, clicker)
+if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_2", "landrush:shared_door_b_1", "landrush:shared_door_t_1", {3,0,1,2})
+end
+end
+
+minetest.registered_nodes['landrush:shared_door_t_2'].on_rightclick = function(pos, node, clicker)
+if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+	landrush.on_rightclick(pos, -1, "landrush:shared_door_b_2", "landrush:shared_door_t_1", "landrush:shared_door_b_1", {3,0,1,2})
+end
+end
+
+-- End of fix
 
 --landrush.register_claimnode("landclaim", "landrush_landclaim.png")
 --landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
@@ -382,23 +397,23 @@ minetest.register_globalstep(function(dtime)
 		local oplayers = minetest.get_connected_players()
 		for _,player in ipairs(oplayers) do
 			local name = player:get_player_name()
-			local sameowner = false	
+			local sameowner = false
 			owner = landrush.get_owner(player:getpos())
-			
+
 			if ( playerHudItems[name] ~= nil ) then
 				if ( playerHudItems[name].lastowner == owner ) then
 					-- same owner as last time don't update the hud
-					sameowner = true				
+					sameowner = true
 				end
 			end
-			
+
 			if ( playerHudItems[name] ~= nil and sameowner == false ) then
 					player:hud_remove(playerHudItems[name].hud)
 					playerHudItems[name] = nil
 			end
-			
+
 			if ( owner ~= nil and sameowner == false ) then
-				--minetest.log('action','Redraw hud for '..name)			
+				--minetest.log('action','Redraw hud for '..name)
 				playerHudItems[name] = {hud = player:hud_add({
 						hud_elem_type = "text",
 						name = "LandOwner",
@@ -407,9 +422,9 @@ minetest.register_globalstep(function(dtime)
 						text="Land Owner: "..owner,
 						scale = {x=200,y=25},
 						alignment = {x=0, y=0},
-				}), lastowner=owner}			
-			end			
-		end		
+				}), lastowner=owner}
+			end
+		end
 	end
 end)
 
