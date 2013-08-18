@@ -401,7 +401,7 @@ minetest.register_node("landrush:unlocked_sign", {
 
 
 minetest.register_craft({
-	output = 'landrush:unlocked_sign',
+	output = 'landrush:unlocked_sign 6',
 	recipe = {
 		{'default:wood','default:wood','default:wood'},
 		{'default:wood','default:wood','landrush:landclaim'},
