@@ -450,5 +450,6 @@ dofile(path.."/bucket.lua")
 dofile(path.."/doors.lua")
 dofile(path.."/fire.lua")
 dofile(path.."/chatcommands.lua")
+dofile(path.."/screwdriver.lua")
 
 end )
