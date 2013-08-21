@@ -252,6 +252,32 @@ function minetest.item_place(itemstack, placer, pointed_thing)
 	owner = landrush.get_owner(pointed_thing.above)
 	player = placer:get_player_name()
 		if landrush.can_interact(player, pointed_thing.above) or itemstack:get_name() == "" then
+			-- add a workaround for TNT, since overwriting the registered node seems not to work
+			if itemstack:get_name() == "tnt:tnt" or itemstack:get_name() == "tnt:tnt_burning" then
+				local pos = pointed_thing.above
+				local temp_pos = pos
+				temp_pos.x = pos.x + 2
+				if player ~= landrush.get_owner( temp_pos ) then
+					minetest.chat_send_player( player, "Do not place TNT near claimed areas..." )
+					return itemstack
+				end
+				temp_pos.x = pos.x - 2
+				if player ~= landrush.get_owner( temp_pos ) then
+					minetest.chat_send_player( player, "Do not place TNT near claimed areas..." )
+					return itemstack
+				end
+				temp_pos.z = pos.z + 2
+				if player ~= landrush.get_owner( temp_pos ) then
+					minetest.chat_send_player( player, "Do not place TNT near claimed areas..." )
+					return itemstack
+				end
+				temp_pos.z = pos.z - 2
+				if player ~= landrush.get_owner( temp_pos ) then
+					minetest.chat_send_player( player, "Do not place TNT near claimed areas..." )
+					return itemstack
+				end
+			end
+			-- end of the workaround
 			return landrush.default_place(itemstack, placer, pointed_thing)
 		else
 			if ( owner ~= nil ) then
