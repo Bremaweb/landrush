@@ -78,7 +78,7 @@ function landrush.get_chunk(pos)
 	local y = 0
 
 	if ( pos.y < -200 ) then
-		y = -32000
+		y = - 32000
 	elseif ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 140 ) then
@@ -96,7 +96,9 @@ function landrush.get_chunk_center(pos)
 	local x = math.floor(pos.x/chunkSize)*chunkSize+7.5
 	local y = 0
 
-	if ( pos.y < -60 ) then
+	if ( pos.y < -200 ) then
+		y = - 32000
+	elseif ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 120 ) then
 		y = -30
@@ -116,6 +118,10 @@ function landrush.get_owner(pos)
 end
 
 function landrush.can_interact(name, pos)
+
+	if ( pos.y < -200 ) then
+		return true
+	end
 
 	if ( minetest.check_player_privs(name, {landrush=true}) ) then
 		return true
@@ -300,6 +306,12 @@ landrush.load_claims()
 		on_place = function(itemstack, placer, pointed_thing)
 			owner = landrush.get_owner(pointed_thing.above)
 			player = placer:get_player_name()
+			
+			if ( pointed_thing.above.y < -200 ) then
+				minetest.chat_send_player(player,"You cannot claim below -200")
+				return itemstack
+			end
+			
 			if owner then
 				minetest.chat_send_player(player, "This area is already owned by "..owner)
 			else
