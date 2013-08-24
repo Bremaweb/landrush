@@ -15,6 +15,23 @@ minetest.register_chatcommand("landowner", {
 	end,
 })
 
+minetest.register_chatcommand("userunclaim", {
+	params = "player",
+	privs = {landrush=true},
+	description = "Unclaims all of a players areas",
+	func = function(name, param)
+		qdone = 0
+		for k,v in pairs(claims) do
+            if claims[k].owner == param then
+                claims[k] = nil
+                qdone = qdone + 1
+            end
+        end
+        landrush.save_claims()
+        minetest.chat_send_player(name,tostring(qdone).." claims unclaims for "..param)
+	end
+})
+
 minetest.register_chatcommand("unclaim", {
 	params = "",
 	description = "unclaims the current map chunk",
