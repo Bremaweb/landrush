@@ -78,7 +78,7 @@ function landrush.get_chunk(pos)
 	local y = 0
 
 	if ( pos.y < -200 ) then
-		y = -32000
+		y = - 32000
 	elseif ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 140 ) then
@@ -96,7 +96,9 @@ function landrush.get_chunk_center(pos)
 	local x = math.floor(pos.x/chunkSize)*chunkSize+7.5
 	local y = 0
 
-	if ( pos.y < -60 ) then
+	if ( pos.y < -200 ) then
+		y = - 32000
+	elseif ( pos.y < -60 ) then
 		y = -200
 	elseif ( pos.y < 120 ) then
 		y = -30
@@ -116,6 +118,10 @@ function landrush.get_owner(pos)
 end
 
 function landrush.can_interact(name, pos)
+
+	if ( pos.y < -200 ) then
+		return true
+	end
 
 	if ( minetest.check_player_privs(name, {landrush=true}) ) then
 		return true
@@ -300,6 +306,12 @@ landrush.load_claims()
 		on_place = function(itemstack, placer, pointed_thing)
 			owner = landrush.get_owner(pointed_thing.above)
 			player = placer:get_player_name()
+			
+			if ( pointed_thing.above.y < -200 ) then
+				minetest.chat_send_player(player,"You cannot claim below -200")
+				return itemstack
+			end
+			
 			if owner then
 				minetest.chat_send_player(player, "This area is already owned by "..owner)
 			else
@@ -389,8 +401,51 @@ end
 
 -- End of fix
 
---landrush.register_claimnode("landclaim", "landrush_landclaim.png")
---landrush.register_claimnode("landclaim_b", "landrush_landclaim.png")
+-- create a new type of sign that is not protected by landrush mod
+minetest.register_node("landrush:unlocked_sign", {
+	description = "Unprotected Sign",
+	drawtype = "signlike",
+	tiles = {"default_sign_wall.png"},
+	inventory_image = "default_sign_wall.png",
+	wield_image = "default_sign_wall.png",
+	paramtype = "light",
+	paramtype2 = "wallmounted",
+	sunlight_propagates = true,
+	walkable = false,
+	selection_box = {
+		type = "wallmounted",
+		--wall_top = <default>
+		--wall_bottom = <default>
+		--wall_side = <default>
+	},
+	groups = {choppy=2,dig_immediate=2,attached_node=1},
+	legacy_wallmounted = true,
+	sounds = default.node_sound_defaults(),
+	on_construct = function(pos)
+		--local n = minetest.get_node(pos)
+		local meta = minetest.get_meta(pos)
+		meta:set_string("formspec", "field[text;;${text}]")
+		meta:set_string("infotext", "\"\"")
+	end,
+	on_receive_fields = function(pos, formname, fields, sender)
+		local meta = minetest.get_meta(pos)
+		fields.text = fields.text or ""
+		print((sender:get_player_name() or "").." wrote \""..fields.text..
+				"\" to sign at "..minetest.pos_to_string(pos))
+		meta:set_string("text", fields.text)
+		meta:set_string("infotext", '"'..fields.text..'"')
+	end,
+})
+
+
+minetest.register_craft({
+	output = 'landrush:unlocked_sign 6',
+	recipe = {
+		{'default:wood','default:wood','default:wood'},
+		{'default:wood','default:wood','landrush:landclaim'},
+		{'','default:stick',''}
+	}
+})
 
 minetest.register_entity("landrush:showarea",{
 	on_activate = function(self, staticdata, dtime_s)
