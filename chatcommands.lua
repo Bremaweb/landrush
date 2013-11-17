@@ -193,8 +193,7 @@ minetest.register_chatcommand("unshareall", {
     description = "unshares all your landclaims with <name>",
     privs = {interact=true},
     func = function(name, param)
-        
-        if minetest.env:get_player_by_name(param) then
+        if name ~= param then
             local qdone = 0
             for k,v in pairs(claims) do
                 if claims[k].owner == name then
@@ -213,7 +212,7 @@ minetest.register_chatcommand("unshareall", {
                 minetest.chat_send_player(name, param.." had noting changed. You may not own any land.")
             end
         else
-                minetest.chat_send_player(name, param.." is not a valid player. Player must be online to unshare.")
+            minetest.chat_send_player(name, 'Use "/unclaim" to unclaim any of your areas.')
         end
     end,
 })
