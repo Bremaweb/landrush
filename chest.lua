@@ -91,3 +91,19 @@ minetest.register_craft({
 		{'default:wood','default:wood','default:wood'}
 	}
 })
+
+minetest.register_craft({
+	output = 'landrush:shared_chest',
+	recipe = {
+		{'landrush:landclaim'},
+		{'default:chest'}
+	}
+})
+
+minetest.register_craft({
+	output = 'landrush:shared_chest',
+	recipe = {
+		{'landrush:landclaim'},
+		{'default:chest_locked'}
+	}
+})
