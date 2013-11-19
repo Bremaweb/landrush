@@ -104,7 +104,7 @@ minetest.register_chatcommand("unsharearea", {
 					minetest.chat_send_player(name, param.." may no longer edit this area.")
 					minetest.chat_send_player(param, name.." has just revoked your editing privileges in an area.")
 				else
-					minetest.chat_send_player(name, 'Use "/unclaim" to unclaim the aria.')
+					minetest.chat_send_player(name, 'Use "/unclaim" to unclaim the area.')
 				end
 			else
 				minetest.chat_send_player(name, "This area is owned by "..owner)
@@ -193,8 +193,7 @@ minetest.register_chatcommand("unshareall", {
     description = "unshares all your landclaims with <name>",
     privs = {interact=true},
     func = function(name, param)
-        
-        if minetest.env:get_player_by_name(param) then
+        if name ~= param then
             local qdone = 0
             for k,v in pairs(claims) do
                 if claims[k].owner == name then
@@ -206,14 +205,14 @@ minetest.register_chatcommand("unshareall", {
             landrush.save_claims()
             
             if qdone > 0 then
-                minetest.chat_send_player(name, param.." no longer may edit all of your areas.")
+                minetest.chat_send_player(name, param.." may no longer edit any of your areas.")
                 minetest.chat_send_player(name, qdone.." total areas were unshared.")
                 minetest.chat_send_player(param, name.." has just unshared all of their areas with you.")
             else
-                minetest.chat_send_player(name, param.." had noting changed. You may not own any land.")
+                minetest.chat_send_player(name, param.." had no permissions being revoked. You may not own any land.")
             end
         else
-                minetest.chat_send_player(name, param.." is not a valid player. Player must be online to unshare.")
+            minetest.chat_send_player(name, 'Use "/unclaim" to unclaim any of your areas.')
         end
     end,
 })

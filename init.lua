@@ -524,6 +524,8 @@ if ( minetest.get_modpath("money2") ) then
 	dofile(path.."/landsale.lua")
 end
 
+dofile(path.."/chest.lua")
+
 minetest.after(0, function ()
 
 dofile(path.."/default.lua")
