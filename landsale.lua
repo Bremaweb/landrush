@@ -83,9 +83,9 @@ minetest.register_node("landrush:sale_block",{
 minetest.register_craft({
 	output = "landrush:sale_block",
 	recipe = {
-		{"","default:wood","default:wood"},
-		{"","default:wood",""},
-		{"default:wood","default:wood",""}
+		{"","group:wood","group:wood"},
+		{"","group:wood",""},
+		{"group:wood","group:wood",""}
 	}
 })
 

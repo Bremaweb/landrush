@@ -86,9 +86,9 @@ minetest.register_node("landrush:shared_chest", {
 minetest.register_craft({
 	output = 'landrush:shared_chest',
 	recipe = {
-		{'default:wood','default:wood','default:wood'},
-		{'default:wood','landrush:landclaim','default:wood'},
-		{'default:wood','default:wood','default:wood'}
+		{'group:wood','group:wood','group:wood'},
+		{'group:wood','landrush:landclaim','group:wood'},
+		{'group:wood','group:wood','group:wood'}
 	}
 })
 
