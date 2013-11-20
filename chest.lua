@@ -4,6 +4,7 @@ minetest.register_node("landrush:shared_chest", {
 		description = "Land Rush Shared Chest",
 		tiles = {"landrush_shared_chest_top.png", "landrush_shared_chest_top.png", "landrush_shared_chest_side.png", "landrush_shared_chest_side.png", "landrush_shared_chest_side.png", "landrush_shared_chest_front.png"},
 		groups = {snappy=2,choppy=2,oddly_breakable_by_hand=2,tubedevice=1,tubedevice_receiver=1},
+		paramtype2 = "facedir",
 		legacy_facedir_simple = true,
 		sounds = default.node_sound_wood_defaults(),
 		
@@ -85,8 +86,24 @@ minetest.register_node("landrush:shared_chest", {
 minetest.register_craft({
 	output = 'landrush:shared_chest',
 	recipe = {
-		{'default:wood','default:wood','default:wood'},
-		{'default:wood','landrush:landclaim','default:wood'},
-		{'default:wood','default:wood','default:wood'}
+		{'group:wood','group:wood','group:wood'},
+		{'group:wood','landrush:landclaim','group:wood'},
+		{'group:wood','group:wood','group:wood'}
+	}
+})
+
+minetest.register_craft({
+	output = 'landrush:shared_chest',
+	recipe = {
+		{'landrush:landclaim'},
+		{'default:chest'}
+	}
+})
+
+minetest.register_craft({
+	output = 'landrush:shared_chest',
+	recipe = {
+		{'landrush:landclaim'},
+		{'default:chest_locked'}
 	}
 })
