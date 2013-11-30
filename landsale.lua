@@ -37,9 +37,9 @@ minetest.register_node("landrush:sale_block",{
 				local transfer = money.transfer(name,owner,price)
 				if ( transfer == nil ) then
 					chunk = landrush.get_chunk(pos)
-					claims[chunk] = {owner=name,shared={},claimtype='landclaim'}
+					landrush.claims[chunk] = {owner=name,shared={},claimtype='landclaim'}
 					landrush.save_claims()
-					minetest.chat_send_player(claims[chunk].owner, "You now own this claim.")
+					minetest.chat_send_player(landrush.claims[chunk].owner, "You now own this claim.")
 					minetest.remove_node(pos)
 					
 					if ( chatplus ) then					
@@ -54,15 +54,7 @@ minetest.register_node("landrush:sale_block",{
 			end			
 		end
 	end,
---[[		
-	on_rightclick = function (pos, node, player, itemstack)		
-		name = player:get_player_name()
-		owner = landrush.get_owner(pos)
-		if ( name == owner ) then
-			minetest.show_formspec(name,"landrush_sell",landrush.sell_formspec(pos,player))			
-		end
-	end,
-]]	
+
 	on_receive_fields = function ( pos, formname, fields, sender )
 		--process formspec
 		local name = sender:get_player_name()

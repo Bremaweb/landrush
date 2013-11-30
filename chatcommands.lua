@@ -21,9 +21,9 @@ minetest.register_chatcommand("userunclaim", {
 	description = "Unclaims all of a players areas",
 	func = function(name, param)
 		qdone = 0
-		for k,v in pairs(claims) do
-            if claims[k].owner == param then
-                claims[k] = nil
+		for k,v in pairs(landrush.claims) do
+            if landrush.claims[k].owner == param then
+                landrush.claims[k] = nil
                 qdone = qdone + 1
             end
         end
@@ -44,14 +44,9 @@ minetest.register_chatcommand("unclaim", {
 		if owner then						
 			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
 				chunk = landrush.get_chunk(pos)
-				--if inv:room_for_item("main", claims[chunk].claimtype) then
-					-- player:get_inventory():add_item("main", {name=claims[chunk].claimtype}) -- they don't get their claim item back
-					claims[chunk] = nil
+					landrush.claims[chunk] = nil
 					landrush.save_claims()
 					minetest.chat_send_player(name, "You renounced your claim on this area.")
-				--else
---					minetest.chat_send_player(name, "Your inventory is full.")
-	--			end
 			else
 				minetest.chat_send_player(name, "This area is owned by "..owner)
 			end
@@ -72,7 +67,7 @@ minetest.register_chatcommand("sharearea", {
 		if owner then
 			if ( owner == name and name ~= param ) or minetest.check_player_privs(name, {landrush=true}) then
 				if minetest.env:get_player_by_name(param) or param=="*all" then
-					claims[landrush.get_chunk(pos)].shared[param] = param
+					landrush.claims[landrush.get_chunk(pos)].shared[param] = param
 					landrush.save_claims()
 					minetest.chat_send_player(name, param.." may now edit this area.")
 					minetest.chat_send_player(param, name.." has just shared an area with you.")
@@ -99,7 +94,7 @@ minetest.register_chatcommand("unsharearea", {
 		if owner then
 			if owner == name or minetest.check_player_privs(name, {landrush=true}) then
 				if name ~= param then
-					claims[landrush.get_chunk(pos)].shared[param] = nil
+					landrush.claims[landrush.get_chunk(pos)].shared[param] = nil
 					landrush.save_claims()
 					minetest.chat_send_player(name, param.." may no longer edit this area.")
 					minetest.chat_send_player(param, name.." has just revoked your editing privileges in an area.")
@@ -125,7 +120,7 @@ minetest.register_chatcommand("mayedit", {
 		local mayedit = landrush.get_owner(pos)
 		if mayedit then
 			local chunk = landrush.get_chunk(pos)
-			for user, user in pairs(claims[chunk].shared) do
+			for user, user in pairs(landrush.claims[chunk].shared) do
 				mayedit = mayedit..", "..user
 			end
 			minetest.chat_send_player(name, mayedit)
@@ -141,20 +136,10 @@ minetest.register_chatcommand("showarea", {
 	privs = {interact=true},
 	func = function(name, param)
 		local player = minetest.env:get_player_by_name(name)
-		local pos = player:getpos()
-		--local owner = landrush.get_owner(pos)
---		if owner then
-			--if landrush.can_interact(name, pos) then
+		local pos = player:getpos()		
 				local entpos = landrush.get_chunk_center(pos)
 				entpos.y = (pos.y-1)
-				minetest.env:add_entity(entpos, "landrush:showarea")
-			--else
-			--	minetest.chat_send_player(name, "This area is owned by "..owner)
-			--end
---[[		else
-			minetest.chat_send_player(name, "This area is unowned.")
-		end]]
--- (Removed at Rarkenin's request)
+				minetest.env:add_entity(entpos, "landrush:showarea")	
 	end,
 })
 
@@ -166,9 +151,9 @@ minetest.register_chatcommand("shareall", {
         
         if minetest.env:get_player_by_name(param) then
             local qdone = 0
-            for k,v in pairs(claims) do
-                if claims[k].owner == name then
-                    claims[k].shared[param] = param
+            for k,v in pairs(landrush.claims) do
+                if landrush.claims[k].owner == name then
+                    landrush.claims[k].shared[param] = param
                     qdone = qdone + 1
                 end
             end
@@ -195,9 +180,9 @@ minetest.register_chatcommand("unshareall", {
     func = function(name, param)
         if name ~= param then
             local qdone = 0
-            for k,v in pairs(claims) do
-                if claims[k].owner == name then
-                    claims[k].shared[param] = nil
+            for k,v in pairs(landrush.claims) do
+                if landrush.claims[k].owner == name then
+                    landrush.claims[k].shared[param] = nil
                     qdone = qdone + 1
                 end
             end
