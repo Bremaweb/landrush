@@ -36,13 +36,13 @@ minetest.register_craft({
 
 
 minetest.registered_nodes['landrush:shared_door_b_1'].on_rightclick = function(pos, node, clicker)
-if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+if ( landrush.can_interact(pos,clicker:get_player_name()) ) then
 	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_1", "landrush:shared_door_b_2", "landrush:shared_door_t_2", {1,2,3,0})
 end
 end
 
 minetest.registered_nodes['landrush:shared_door_t_1'].on_rightclick = function(pos, node, clicker)
-if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+if ( landrush.can_interact(pos,clicker:get_player_name()) ) then
 	landrush.on_rightclick(pos, -1, "landrush:shared_door_b_1", "landrush:shared_door_t_2", "landrush:shared_door_b_2", {1,2,3,0})
 end
 end
@@ -51,13 +51,13 @@ end
 -- Bug was caused, because the reverse order of the on_rightclick was not taken into account
 
 minetest.registered_nodes['landrush:shared_door_b_2'].on_rightclick = function(pos, node, clicker)
-if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+if ( landrush.can_interact(pos,clicker:get_player_name()) ) then
 	landrush.on_rightclick(pos, 1, "landrush:shared_door_t_2", "landrush:shared_door_b_1", "landrush:shared_door_t_1", {3,0,1,2})
 end
 end
 
 minetest.registered_nodes['landrush:shared_door_t_2'].on_rightclick = function(pos, node, clicker)
-if ( landrush.can_interact(clicker:get_player_name(),pos) ) then
+if ( landrush.can_interact(pos,clicker:get_player_name()) ) then
 	landrush.on_rightclick(pos, -1, "landrush:shared_door_b_2", "landrush:shared_door_t_1", "landrush:shared_door_b_1", {3,0,1,2})
 end
 end 

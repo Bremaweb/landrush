@@ -28,7 +28,7 @@ if minetest.get_modpath("default") then
 		on_receive_fields = function(pos, formname, fields, sender)
 		--print("Sign at "..minetest.pos_to_string(pos).." got "..dump(fields))
 			local name = sender:get_player_name()
-			if landrush.can_interact(name, pos) then
+			if landrush.can_interact(pos, name) then
 				local meta = minetest.env:get_meta(pos)
 				fields.text = fields.text or ""
 				print((name or "").." wrote \""..fields.text..

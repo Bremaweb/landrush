@@ -6,7 +6,7 @@ if minetest.get_modpath("doors") then
 			local bottom = pointed_thing.above
 			local top = {x=pointed_thing.above.x, y=pointed_thing.above.y+1, z=pointed_thing.above.z}
 			local name = placer:get_player_name()
-			if landrush.can_interact(name, top) and landrush.can_interact(name, bottom) then
+			if landrush.can_interact(top,name) and landrush.can_interact(bottom, name) then
 				return on_place(itemstack, placer, pointed_thing)
 			else
 				topowner = landrush.get_owner(top)

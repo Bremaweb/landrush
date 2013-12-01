@@ -38,7 +38,7 @@ function safe_screwdriver_handler (itemstack,user,pointed_thing)
 	if pointed_thing.type~="node" then return end
 	local pos=minetest.get_pointed_thing_position(pointed_thing,above)
 	-- Landrush fix
-	if not landrush.can_interact( player_name, pos ) then
+	if not landrush.can_interact( pos, player_name ) then
 		return nil
 	end
 	-- end fix

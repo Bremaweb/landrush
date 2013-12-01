@@ -14,7 +14,7 @@ if minetest.get_modpath("bucket") then
 			liquiddef = bucket.liquids[n.name]
 			if liquiddef ~= nil and liquiddef.source == n.name and liquiddef.itemname ~= nil then
 				local player = user:get_player_name()
-				if landrush.can_interact(player, pointed_thing.under) then
+				if landrush.can_interact(pointed_thing.under, player) then
 					minetest.env:add_node(pointed_thing.under, {name="air"})
 					return {name=liquiddef.itemname}
 				else
@@ -36,13 +36,13 @@ if minetest.get_modpath("bucket") then
 				n = minetest.env:get_node(pointed_thing.under)
 				local player = user:get_player_name()
 				if minetest.registered_nodes[n.name].buildable_to then
-					if landrush.can_interact(player, pointed_thing.under) then
+					if landrush.can_interact(pointed_thing.under, player) then
 						return on_use(itemstack, user, pointed_thing)
 					else
 						minetest.chat_send_player(player, "Area owned by "..landrush.get_owner(pointed_thing.above))
 					end
 				else
-					if landrush.can_interact(player, pointed_thing.above) then
+					if landrush.can_interact(pointed_thing.above, player) then
 						return on_use(itemstack, user, pointed_thing)
 					else
 						minetest.chat_send_player(player, "Area owned by "..landrush.get_owner(pointed_thing.above))

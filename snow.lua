@@ -16,7 +16,7 @@ if minetest.get_modpath( 'snow' ) then
 
 		if self.lastpos.x~=nil then
 			if node.name ~= "air" then
-				if landrush.can_interact( ' ', pos ) then
+				if landrush.can_interact( pos, ' ' ) then
 					snow.place(pos)
 				end
 				self.object:remove()

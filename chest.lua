@@ -24,7 +24,7 @@ minetest.register_node("landrush:shared_chest", {
 		
 		allow_metadata_inventory_move = function(pos, from_list, from_index, to_list, to_index, count, player)
 			local meta = minetest.get_meta(pos)
-			if not landrush.can_interact(player:get_player_name(),pos) then
+			if not landrush.can_interact(pos,player:get_player_name()) then
 				minetest.log("action", player:get_player_name() .. " tried to access a shared chest at ".. minetest.pos_to_string(pos))
 				return 0
 			end
@@ -33,7 +33,7 @@ minetest.register_node("landrush:shared_chest", {
 				
 	    allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 			local meta = minetest.get_meta(pos)
-			if not landrush.can_interact(player:get_player_name(),pos) then
+			if not landrush.can_interact(pos,player:get_player_name()) then
 				minetest.log("action", player:get_player_name() .. " tried to access a shared chest at ".. minetest.pos_to_string(pos))
 				return 0
 			end
@@ -42,7 +42,7 @@ minetest.register_node("landrush:shared_chest", {
 		
 	    allow_metadata_inventory_take = function(pos, listname, index, stack, player)
 			local meta = minetest.get_meta(pos)
-			if not landrush.can_interact(player:get_player_name(),pos) then
+			if not landrush.can_interact(pos,player:get_player_name()) then
 				minetest.log("action", player:get_player_name()..
 						" tried to access a shared chest at "..
 						minetest.pos_to_string(pos))
