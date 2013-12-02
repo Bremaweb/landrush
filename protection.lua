@@ -46,6 +46,7 @@ end
 
 function landrush.do_autoban(pos,name) 
 	-- moved this to it's own function so landrush.protection_violation is a little cleaner, and this could be overwritten as well
+	
 	if ( landrush.offense[name] == nil ) then
 			landrush.offense[name] = {count=0,lastpos=nil,lasttime=os.time(),bancount=0}
 		end
@@ -98,7 +99,7 @@ function landrush.do_autoban(pos,name)
 		if ( landrush.offense[name].count > tonumber(landrush.config:get("banWarning")) ) then
 			minetest.chat_send_player(name, "Stop trying to dig in claimed areas or you will be banned!")
 			minetest.chat_send_player(name, "Use /showarea and /landowner to see the protected area and who owns it.")
-			minetest.sound_play("landrush_ban_warning", {to_name=name,gain = 10.0})
+			minetest.sound_play("landrush_ban_warning", {to_player=name,gain = 10.0})
 		end
 
 		landrush.offense[name].lasttime = os.time()
