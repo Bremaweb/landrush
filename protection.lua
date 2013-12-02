@@ -111,6 +111,11 @@ function landrush.protection_violation(pos,name)
 	-- this is the default discipline
 	
 	local player = minetest.get_player_by_name(name)
+	
+	if ( player == nil ) then
+	  return
+	end
+	
 	local owner = landrush.get_owner(pos)
 	
 	if ( landrush.config:get_bool("requireClaim") == true ) then
