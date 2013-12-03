@@ -81,8 +81,8 @@ function landrush.do_autoban(pos,name)
 			minetest.log("action",name.." has been banned for griefing attempts")
 			minetest.chat_send_all(name.." has been banned for griefing attempts")
 
-			if ( chatplus and landrush.config:get_string("adminUser") ~= nil) then
-				table.insert(chatplus.names[landrush.config:get_string("adminUser")].messages,"mail from <LandRush>: "..name.." banned for "..tostring(banlength).." minutes for attempted griefing")
+			if ( chatplus and landrush.config:get("adminUser") ~= nil) then
+				table.insert(chatplus.names[landrush.config:get("adminUser")].messages,"mail from <LandRush>: "..name.." banned for "..tostring(banlength).." minutes for attempted griefing")
 			end
 			minetest.ban_player(name)
 
