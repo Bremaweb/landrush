@@ -32,6 +32,11 @@ landrush.load_claims()
 		on_place = function(itemstack, placer, pointed_thing)
 			owner = landrush.get_owner(pointed_thing.above)
 			player = placer:get_player_name()
+
+			if player:find("[gG]uest") then
+				minetest.chat_send_player(player,"Guests cannot claim land")
+				return itemstack
+			end
 			
 			if ( pointed_thing.above.y < -200 ) then
 				minetest.chat_send_player(player,"You cannot claim below -200")
