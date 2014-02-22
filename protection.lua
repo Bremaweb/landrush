@@ -126,10 +126,14 @@ function landrush.protection_violation(pos,name)
 	end
 	
 	minetest.chat_send_player(name, "Area owned by "..tostring(owner).." stop trying to dig here!")
-	player:set_hp( player:get_hp() - landrush.config:get("offenseDamage") )
+	if ( tonumber(landrush.config:get("noDamageTime")) > landrush.get_timeonline(name) ) then
+		player:set_hp( player:get_hp() - landrush.config:get("offenseDamage") )
+	end
 	
 	if ( landrush.config:get_bool("autoBan") == true ) then
-		landrush.do_autoban(pos,name)
+		if ( tonumber(landrush.config:get("noBanTime")) > landrush.get_timeonline(name) ) then
+			landrush.do_autoban(pos,name)
+		end
 	end
 
 end
