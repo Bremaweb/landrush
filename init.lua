@@ -79,9 +79,19 @@ minetest.register_entity("landrush:showarea",{
 		hp_max = 1,
 		physical = true,
 		weight = 0,
-		collisionbox = {-8,-8,-8,8,8,8},
+		collisionbox = {
+			landrush.config:get("chunkSize")/-2,
+			landrush.config:get("chunkSize")/-2,
+			landrush.config:get("chunkSize")/-2,
+			landrush.config:get("chunkSize")/2,
+			landrush.config:get("chunkSize")/2,
+			landrush.config:get("chunkSize")/2,
+		},
 		visual = "mesh",
-		visual_size = {x=16.1, y=16.1},
+		visual_size = {
+        	x=landrush.config:get("chunkSize")+0.1,
+        	y=landrush.config:get("chunkSize")+0.1
+		},
 		mesh = "landrush_showarea.x",
 		textures = {nil, nil, "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png", "landrush_showarea.png"}, -- number of required textures depends on visual
 		colors = {}, -- number of required colors depends on visual
