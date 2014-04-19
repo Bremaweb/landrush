@@ -7,10 +7,10 @@ function landrush.get_chunk(pos)
 		y = - 32000
 	elseif ( pos.y < -60 ) then
 		y = -200
-	elseif ( pos.y < 140 ) then
+	elseif ( pos.y < 120 ) then
 		y = -30
 	else
-		y = 90
+		y = 120
 	end
 
 
