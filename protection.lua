@@ -90,7 +90,7 @@ function landrush.do_autoban(pos,name)
 			landrush.offense[name].lastpos = nil
 
 			if ( landrush.offense[name].bancount < 4 ) then
-				minetest.after( (banlength * 60), minetest.unban_name_or_ip,name )
+				minetest.after( (banlength * 60), minetest.unban_player_or_ip,name )
 			end
 
 			return
