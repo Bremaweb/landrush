@@ -16,7 +16,7 @@ function landrush.on_rightclick(pos, dir, check_name, replace, replace_dir, para
 		minetest.get_meta(pos):from_table(meta)
 	end
 	
-doors:register_door("landrush:shared_door", {
+doors.register_door("landrush:shared_door", {
 	description = "Shared Door",
 	inventory_image = "shared_door_inv.png",
 	groups = {snappy=1,bendy=2,cracky=1,melty=2,level=2,door=1},
