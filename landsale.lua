@@ -63,7 +63,7 @@ minetest.register_node("landrush:sale_block",{
 			local meta = minetest.get_meta(pos)
 			meta:set_int("price",fields.price)
 			meta:set_string("note",fields.note)
-			meta:set_string("infotext","For sale by "..owner.." for " .. tostring(fields.price) .." "..fields.note)
+			meta:set_string("infotext","For sale by "..owner.." for " .. tostring(fields.price) .." "..tostring(fields.note))
 			meta:set_string("formspec",landrush.sell_formspec(pos,sender))
 		else
 			minetest.chat_send_player(name,"You can't configure this sale!")
