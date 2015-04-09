@@ -9,7 +9,7 @@ minetest.register_globalstep(function(dtime)
 		for _,player in ipairs(oplayers) do
 			local name = player:get_player_name()
 			local sameowner = false
-			owner = landrush.get_owner(player:getpos())
+			local owner = landrush.get_owner(player:getpos())
 
 			if ( landrush.playerHudItems[name] ~= nil ) then
 				if ( landrush.playerHudItems[name].lastowner == owner ) then

@@ -155,44 +155,44 @@ minetest.register_on_protection_violation( landrush.protection_violation )
 landrush.default_place = minetest.item_place
 
 function minetest.item_place(itemstack, placer, pointed_thing)
-	owner = landrush.get_owner(pointed_thing.above)
-	name = placer:get_player_name()
-		if landrush.can_interact(pointed_thing.above,name) or itemstack:get_name() == "" then
-			-- add a workaround for TNT, since overwriting the registered node seems not to work
-			if itemstack:get_name() == "tnt:tnt" or itemstack:get_name() == "tnt:tnt_burning" then
-				local pos = pointed_thing.above
-				local temp_pos = pos
-				temp_pos.x = pos.x + 2
-				if name ~= landrush.get_owner( temp_pos ) then
-					minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
-					return itemstack
-				end
-				temp_pos.x = pos.x - 2
-				if name ~= landrush.get_owner( temp_pos ) then
-					minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
-					return itemstack
-				end
-				temp_pos.z = pos.z + 2
-				if name ~= landrush.get_owner( temp_pos ) then
-					minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
-					return itemstack
-				end
-				temp_pos.z = pos.z - 2
-				if name ~= landrush.get_owner( temp_pos ) then
-					minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
-					return itemstack
-				end
-			end
-			-- end of the workaround
-			return landrush.default_place(itemstack, placer, pointed_thing)
-		else
-			if ( owner ~= nil ) then
-				minetest.chat_send_player(name, "Area owned by "..owner)
+	local owner = landrush.get_owner(pointed_thing.above)
+	local name = placer:get_player_name()
+	if landrush.can_interact(pointed_thing.above,name) or itemstack:get_name() == "" then
+		-- add a workaround for TNT, since overwriting the registered node seems not to work
+		if itemstack:get_name() == "tnt:tnt" or itemstack:get_name() == "tnt:tnt_burning" then
+			local pos = pointed_thing.above
+			local temp_pos = pos
+			temp_pos.x = pos.x + 2
+			if name ~= landrush.get_owner( temp_pos ) then
+				minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
 				return itemstack
-			else
-				minetest.chat_send_player(name,"Area unclaimed, claim this area to build")
+			end
+			temp_pos.x = pos.x - 2
+			if name ~= landrush.get_owner( temp_pos ) then
+				minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
+				return itemstack
+			end
+			temp_pos.z = pos.z + 2
+			if name ~= landrush.get_owner( temp_pos ) then
+				minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
+				return itemstack
+			end
+			temp_pos.z = pos.z - 2
+			if name ~= landrush.get_owner( temp_pos ) then
+				minetest.chat_send_player( name, "Do not place TNT near claimed areas..." )
 				return itemstack
 			end
 		end
+		-- end of the workaround
+		return landrush.default_place(itemstack, placer, pointed_thing)
+	else
+		if ( owner ~= nil ) then
+			minetest.chat_send_player(name, "Area owned by "..owner)
+			return itemstack
+		else
+			minetest.chat_send_player(name,"Area unclaimed, claim this area to build")
+			return itemstack
+		end
+	end
 end
 

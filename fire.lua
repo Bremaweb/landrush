@@ -1,4 +1,4 @@
-if minetest.get_modpath("fire") then
+if minetest.get_modpath("fire") and rawget(_G, "fire") then
 	landrush.default_flame_should_extinguish = fire.flame_should_extinguish
 
 	function fire.flame_should_extinguish(pos)
