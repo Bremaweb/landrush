@@ -1,7 +1,7 @@
 minetest.log('action','Loading Land Rush Land Claim')
 
 -- Freeminer Compatibility
-if freeminer then
+if rawget(_G, "freeminer") then
 	minetest = freeminer
 end
 
