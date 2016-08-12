@@ -29,7 +29,7 @@ minetest.register_globalstep(function(dtime)
 						hud_elem_type = "text",
 						name = "LandOwner",
 						number = 0xFFFFFF,
-						position = {x=.2, y=.98},
+						position = {x=0.02, y=.98},
 						text="Land Owner: "..owner,
 						scale = {x=200,y=25},
 						alignment = {x=0, y=0},
