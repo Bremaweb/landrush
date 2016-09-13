@@ -30,7 +30,7 @@ function landrush.can_interact(pos, name)
 
 	-- see if the owner is offline, and area is not shared then it's off limits	
 	if ( landrush.claims[chunk].owner ~= name and landrush.config:get_bool("onlineProtection") == false ) then
-		if ( minetest.get_player_by_name(owner) ~= nil ) then
+		if ( minetest.get_player_by_name(landrush.claims[chunk].owner) ~= nil ) then
 			minetest.chat_send_player( landrush.claims[chunk].owner, "You are being griefed by "..name.." at "..minetest.pos_to_string(pos) )
 
 			for u,u in pairs(landrush.claims[chunk].shared) do
