@@ -5,7 +5,7 @@ local signdef = table.copy(minetest.registered_nodes["default:sign_wall"])
 signdef.description = "Unprotected Sign"
 signdef.on_receive_fields = function(pos, formname, fields, sender)
 	local meta = minetest.get_meta(pos)
-	fields.text = fields.text or ""
+	if not fields.text then return end
 	print((sender:get_player_name() or "").." wrote \""..fields.text..
 			"\" to sign at "..minetest.pos_to_string(pos))
 	meta:set_string("text", fields.text)
