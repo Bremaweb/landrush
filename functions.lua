@@ -1,5 +1,5 @@
 function landrush.get_chunk(pos)
-	local x = math.floor(pos.x/landrush.config:get("chunkSize"))
+	local x = math.floor((pos.x+.5)/landrush.config:get("chunkSize"))
 	-- 3 levels of vertical protection
 	local y = 0
 
@@ -14,12 +14,12 @@ function landrush.get_chunk(pos)
 	end
 
 
-	local z = math.floor(pos.z/landrush.config:get("chunkSize"))
+	local z = math.floor((pos.x+.5)/landrush.config:get("chunkSize"))
 	return x..","..y..","..z
 end
 
 function landrush.get_chunk_center(pos)
-	local x = math.floor(pos.x/landrush.config:get("chunkSize"))*landrush.config:get("chunkSize")+7.5
+	local x = math.floor(pos.x/landrush.config:get("chunkSize"))*landrush.config:get("chunkSize")+landrush.config:get("chunkSize")/2-.5
 	local y = 0
 
 	if ( pos.y < -200 ) then
@@ -32,7 +32,7 @@ function landrush.get_chunk_center(pos)
 		y = 120
 	end
 
-	local z = math.floor(pos.z/landrush.config:get("chunkSize"))*landrush.config:get("chunkSize")+7.5
+	local z = math.floor(pos.z/landrush.config:get("chunkSize"))*landrush.config:get("chunkSize")+landrush.config:get("chunkSize")/2-.5
 	return {x=x,y=y,z=z}
 end
 
